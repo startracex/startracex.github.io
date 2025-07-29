@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+img {
+  user-select: none;
+  pointer-events: none;
+}
+
+[data-theme="light"] ::selection {
+  color: hsl(30 100% 95%);
+  background: hsl(180 100% 8%);
+}
+
+[data-theme="dark"] ::selection {
+  color: hsl(225 100% 8%);
+  background: hsl(350 100% 95%);
+}
