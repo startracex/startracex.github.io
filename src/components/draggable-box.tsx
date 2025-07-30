@@ -162,22 +162,27 @@ function DraggableBox({
         stiffness: isDragging ? 800 : 400,
       }}
     >
-      <div className="flex flex-col border dark:border-zinc-600 dark:shadow-white/5 shadow-lg border-zinc-400 rounded-sm hover:shadow-xl transition-shadow">
+      <div
+        className="flex flex-col border dark:border-zinc-600 dark:shadow-white/5 shadow-lg border-zinc-400 rounded-sm hover:shadow-xl transition-shadow"
+        onClick={() => {
+          onBringToFront(id);
+        }}
+      >
         <div
           className="flex flex-row p-4 items-center justify-between select-none cursor-move"
           onMouseDown={handleMouseDown}
           onClick={handleToggleOpen}
         >
-          <div className="leading-none font-semibold flex items-center gap-2">
+          <div className="leading-none w-full font-semibold flex items-center gap-2">
             <GripHorizontal className="w-4 h-4 text-muted-foreground" />
-            {title}
+            <div className="flex-1">{title}</div>
+            <motion.div
+              animate={{ rotate: isOpen ? 90 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+            </motion.div>
           </div>
-          <motion.div
-            animate={{ rotate: isOpen ? 90 : 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <ChevronRight className="w-4 h-4 text-muted-foreground" />
-          </motion.div>
         </div>
 
         <motion.div
