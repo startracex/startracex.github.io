@@ -40,8 +40,8 @@ function DraggableBox({
       const container = containerRef.current.getBoundingClientRect();
       const box = boxRef.current.getBoundingClientRect();
 
-      const maxX = container.width - box.width;
-      const maxY = container.height - box.height;
+      const maxX = container.width - box.width + 2;
+      const maxY = container.height - box.height - 2;
 
       return {
         x: Math.max(0, Math.min(x, maxX)),
