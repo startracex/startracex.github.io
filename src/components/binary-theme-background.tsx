@@ -24,6 +24,9 @@ export default function BinaryThemeBackground({ children }: { children: ReactNod
     >
       <header className="contents">
         <FullScreenThemeSwitcher
+          lightTooltip="Switch to light theme"
+          darkTooltip="Switch to dark theme"
+          noneTooltip="Switch to split view"
           lightContent={
             <WordTransition
               effectTime={1500}

@@ -1,4 +1,3 @@
-"use client";
 import { type ReactNode, useEffect, useRef } from "react";
 import { useState, useCallback } from "react";
 import type { BinaryTheme } from "ternary-theme";
@@ -6,11 +5,17 @@ import type { BinaryTheme } from "ternary-theme";
 export default function FullScreenThemeSwitcher({
   lightContent,
   darkContent,
+  lightTooltip,
+  darkTooltip,
+  noneTooltip,
   children,
   onChange,
 }: {
   lightContent: ReactNode;
   darkContent: ReactNode;
+  lightTooltip?: ReactNode;
+  darkTooltip?: ReactNode;
+  noneTooltip?: ReactNode;
   children?: ReactNode;
   onChange?: (theme: BinaryTheme) => void;
 }) {
@@ -77,9 +82,21 @@ export default function FullScreenThemeSwitcher({
   const tooltipText =
     expandedSide === "none"
       ? mouseSide === "light"
-        ? "Switch to light theme"
-        : "Switch to dark theme"
-      : "Switch to split view";
+        ? lightTooltip
+        : darkTooltip
+      : noneTooltip;
+
+  const showPopover = useCallback(() => {
+    if (tooltipRef.current) {
+      tooltipRef.current.showPopover();
+    }
+  }, [tooltipRef]);
+
+  const hidePopover = useCallback(() => {
+    if (tooltipRef.current) {
+      tooltipRef.current.hidePopover();
+    }
+  }, [tooltipRef]);
 
   return (
     <div
@@ -88,9 +105,9 @@ export default function FullScreenThemeSwitcher({
     >
       <div
         className="relative h-screen flex items-center justify-center"
-        onMouseEnter={() => tooltipRef.current?.showPopover()}
-        onMouseMove={() => tooltipRef.current?.showPopover()}
-        onMouseLeave={() => tooltipRef.current?.hidePopover()}
+        onMouseEnter={showPopover}
+        onMouseMove={showPopover}
+        onMouseLeave={hidePopover}
       >
         <div
           className={`absolute inset-y-0 left-0 transition-all duration-500 ease-in-out ${whiteWidthClass} z-1 bg-white`}
