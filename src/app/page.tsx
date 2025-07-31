@@ -1,53 +1,12 @@
-"use client";
 import type React from "react";
-import { ChevronUp } from "lucide-react";
-import { useTheme } from "ternary-theme/context.js";
-import FSTS from "@/components/full-screen-theme-switcher";
-import WordTransition from "@/components/word-transition";
 import BackToTop from "@/components/back-to-top";
 import { DraggableContainer } from "@/components/draggable-box";
 import ContributionActivity from "@/components/contribution-activity";
+import BinaryThemeBackground from "@/components/binary-theme-background";
 
 export default function Page() {
-  const { resolvedTheme, setTheme } = useTheme();
   return (
-    <div
-      style={{
-        backgroundClip: "content-box",
-        backgroundImage:
-          resolvedTheme === "dark"
-            ? "linear-gradient(to right, #242424 1px, transparent 1px), linear-gradient(to bottom, #242424 1px, transparent 1px)"
-            : "radial-gradient(#3c3c3c 1px, transparent 1px)",
-        backgroundSize: "70px 70px",
-        backgroundPosition: resolvedTheme === "dark" ? "35px 35px" : "0.5px 0.5px",
-        backgroundColor: resolvedTheme === "dark" ? "black" : "white",
-        transition: "background-color .3s",
-        color: resolvedTheme === "dark" ? "white" : "black",
-      }}
-    >
-      <header className="contents">
-        <FSTS
-          lightContent={
-            <WordTransition
-              effectTime={1500}
-              words={["SHIRO", "START"]}
-              reverse
-            />
-          }
-          darkContent={
-            <WordTransition
-              effectTime={1500}
-              words={["WANG", "RACEX"]}
-            />
-          }
-          onChange={setTheme}
-        >
-          <ChevronUp
-            className="pointer-events-none z-1 absolute left-1/2 bottom-8 text-white mix-blend-difference -translate-x-1/2"
-            size="4em"
-          />
-        </FSTS>
-      </header>
+    <BinaryThemeBackground>
       <main className="w-full max-w-4xl px-4 mx-auto mt-12 mb-6 space-y-12">
         <div className="shadow-md shadow-zinc-800/15 dark:shadow-zinc-100/10 rounded-lg p-8 space-y-6">
           <h2 className="text-3xl font-semibold">About me</h2>
@@ -72,7 +31,7 @@ export default function Page() {
         </div>
 
         <div className="flex justify-center px-2">
-          <ContributionActivity theme={resolvedTheme} />
+          <ContributionActivity />
         </div>
 
         <DraggableContainer
@@ -134,6 +93,6 @@ export default function Page() {
         </a>
       </footer>
       <BackToTop />
-    </div>
+    </BinaryThemeBackground>
   );
 }

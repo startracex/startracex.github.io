@@ -1,8 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import ActivityCalendar from "react-activity-calendar";
+import { useTheme } from "ternary-theme";
 
-export default function ContributionActivity({ theme }: { theme?: "light" | "dark" }) {
+export default function ContributionActivity() {
+  const { resolvedTheme } = useTheme();
   const [data, setData] = useState();
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function ContributionActivity({ theme }: { theme?: "light" | "dar
     <ActivityCalendar
       loading={!data}
       data={data}
-      colorScheme={theme}
+      colorScheme={resolvedTheme}
       hideColorLegend
       hideTotalCount
     />
