@@ -40,3 +40,19 @@
   --color-fd-accent-foreground: hsl(0, 0%, 100%);
   --color-fd-ring: hsl(0, 0%, 34.9%);
 }
+
+#nd-nav {
+  position: relative;
+}
+
+#nd-page > article {
+  padding: 0;
+}
+
+#nd-page {
+  display: contents;
+  
+  & > article {
+    padding: 0;
+  }
+}

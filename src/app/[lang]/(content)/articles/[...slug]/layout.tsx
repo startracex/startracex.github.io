@@ -1,4 +1,4 @@
-import { DocsLayout } from "fumadocs-ui/layouts/notebook";
+import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
 import { PageTree } from "fumadocs-core/server";
 import { articleSource } from "@/lib/source";
@@ -20,7 +20,12 @@ export default async function Layout({
       themeSwitch={{
         enabled: false,
       }}
-      i18n={true}
+      searchToggle={{
+        enabled: false,
+      }}
+      sidebar={{
+        enabled: false,
+      }}
       tree={tree}
     >
       {children}

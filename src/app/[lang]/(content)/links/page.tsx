@@ -19,8 +19,8 @@ export default async function Page({
   const { lang } = await params;
   const t = createTranslation(translations[lang]);
   return (
-    <div className="max-w-7xl w-full p-6 mx-auto">
-      <div className="flex justify-between items-end mt-6 mb-8">
+    <div>
+      <div className="flex justify-between items-end mb-8">
         <h1 className="text-4xl font-bold">{t`Links`}</h1>
       </div>
       <div className="gap-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
