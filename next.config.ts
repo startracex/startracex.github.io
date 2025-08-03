@@ -1,14 +1,23 @@
 import type { NextConfig } from "next";
+import { createMDX } from "fumadocs-mdx/next";
 
-const output = process.env.OUTPUT as undefined | "export" | "standalone";
+let output = process.env.NEXT_PUBLIC_OUTPUT as undefined | "export" | "standalone";
+if (output !== "export" && output !== "standalone") {
+  output = undefined;
+}
+
+const withMDX = createMDX();
 
 const nextConfig: NextConfig = {
   output,
+  trailingSlash: output === "export",
   experimental: {
-    mdxRs: {
-      mdxType: "gfm",
-    },
+    useLightningcss: true,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  productionBrowserSourceMaps: process.env.NODE_ENV === "development",
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);

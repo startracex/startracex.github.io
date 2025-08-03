@@ -1,18 +1,23 @@
-import Image, { ImageProps } from "next/image";
 import Heading from "@godown/react/heading.js";
+import defaultComponents from "fumadocs-ui/mdx";
+import { MDXComponents } from "mdx/types";
 
 const createHeading =
-  (as) =>
-  ({ children }) => (
-    <Heading
-      id={children + ""}
-      as={as}
-    >
-      {children}
-    </Heading>
-  );
+  (as: 1 | 2 | 3 | 4 | 5 | 6) =>
+  ({ id, children }) => {
+    return (
+      <Heading
+        id={id}
+        as={`h${as}`}
+        side="left"
+        className="ml-[1em]"
+      >
+        {children}
+      </Heading>
+    );
+  };
 
-export function useMDXComponents() {
+export function useMDXComponents(): MDXComponents {
   return {
     h1: createHeading(1),
     h2: createHeading(2),
@@ -20,12 +25,13 @@ export function useMDXComponents() {
     h4: createHeading(4),
     h5: createHeading(5),
     h6: createHeading(6),
-    img: (props) => (
-      <Image
-        sizes="100vw"
-        style={{ width: "100%", height: "auto" }}
-        {...(props as ImageProps)}
-      />
-    ),
+  };
+}
+
+export function getMDXComponents(components: MDXComponents): MDXComponents {
+  return {
+    ...defaultComponents,
+    ...useMDXComponents(),
+    ...components,
   };
 }

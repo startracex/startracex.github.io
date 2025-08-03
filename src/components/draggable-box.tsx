@@ -163,7 +163,7 @@ function DraggableBox({
       }}
     >
       <div
-        className="flex flex-col border dark:border-zinc-600 dark:shadow-white/5 shadow-lg border-zinc-400 rounded-sm hover:shadow-xl transition-shadow"
+        className="flex flex-col rounded-sm border shadow-md hover:shadow-lg transition-shadow"
         onClick={() => {
           onBringToFront(id);
         }}
@@ -174,13 +174,13 @@ function DraggableBox({
           onClick={handleToggleOpen}
         >
           <div className="leading-none w-full font-semibold flex items-center gap-2">
-            <GripHorizontal className="w-4 h-4 text-muted-foreground" />
+            <GripHorizontal className="w-4 h-4" />
             <div className="flex-1">{title}</div>
             <motion.div
               animate={{ rotate: isOpen ? 90 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronRight className="w-4 h-4 text-muted-foreground" />
+              <ChevronRight className="w-4 h-4" />
             </motion.div>
           </div>
         </div>
@@ -201,7 +201,7 @@ function DraggableBox({
             className="pt-0 p-4"
             ref={contentRef}
           >
-            <div className=" text-muted-foreground leading-relaxed">{content}</div>
+            <div className="leading-relaxed">{content}</div>
           </div>
         </motion.div>
       </div>
@@ -269,7 +269,7 @@ export function DraggableContainer({
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-156 rounded-lg border-2 border-dashed dark:border-zinc-700 border-zinc-300 overflow-hidden"
+      className="relative w-full h-140 rounded-lg border-2 border-dashed overflow-hidden"
     >
       {boxes.map((box, index) => (
         <DraggableBox
