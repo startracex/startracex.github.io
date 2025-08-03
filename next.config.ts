@@ -17,7 +17,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  productionBrowserSourceMaps: process.env.NODE_ENV === "development",
+  productionBrowserSourceMaps: true,
 };
 
 export default withMDX(nextConfig);
