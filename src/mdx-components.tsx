@@ -10,7 +10,7 @@ const createHeading =
         id={id}
         as={`h${as}`}
         side="left"
-        className="ml-[1em]"
+        className="ml-4"
       >
         {children}
       </Heading>
