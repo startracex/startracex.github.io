@@ -57,17 +57,12 @@ export default function FullScreenThemeSwitcher({
     const handleMouseMove = (e: MouseEvent) => {
       const { clientX: x, clientY: y } = e;
       setMousePos({ x, y });
+      setTooltipPosition(x, y);
     };
 
     addEventListener("mousemove", handleMouseMove);
     return () => removeEventListener("mousemove", handleMouseMove);
   }, [setTooltipPosition]);
-
-  useEffect(() => {
-    requestAnimationFrame(() => {
-      setTooltipPosition(mousePos.x, mousePos.y);
-    });
-  }, [expandedSide, mouseSide, mousePos, setTooltipPosition]);
 
   const handleClick = useCallback(
     (side: BinaryTheme) => {
@@ -79,12 +74,7 @@ export default function FullScreenThemeSwitcher({
 
   const whiteWidthClass = expandedSide === "light" ? "w-full" : expandedSide === "dark" ? "w-0" : "w-1/2";
 
-  const tooltipText =
-    expandedSide === "none"
-      ? mouseSide === "light"
-        ? lightTooltip
-        : darkTooltip
-      : noneTooltip;
+  const tooltipText = expandedSide === "none" ? (mouseSide === "light" ? lightTooltip : darkTooltip) : noneTooltip;
 
   const showPopover = useCallback(() => {
     if (tooltipRef.current) {
