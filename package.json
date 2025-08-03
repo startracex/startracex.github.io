@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
+    "dev:export": "cross-env NEXT_PUBLIC_OUTPUT=export next dev --turbopack",
     "build": "next build --turbopack",
-    "dev:export": "cross-env NEXT_PUBLIC_OUTPUT=export next dev --turbopack -p 3001",
     "build:export": "cross-env NEXT_PUBLIC_OUTPUT=export next build --turbopack",
+    "build:standalone": "cross-env NEXT_PUBLIC_OUTPUT=standalone next build --turbopack && node standalone-copy.ts",
     "start": "next start",
+    "start:standalone": "node .next/standalone/server.js",
     "fmt": "dprint fmt",
     "postinstall": "fumadocs-mdx"
   },
