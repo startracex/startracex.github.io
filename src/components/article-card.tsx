@@ -51,7 +51,7 @@ export default function ArticleCard({ title, description, date }: ArticleCardPro
   return (
     <div
       className={cn(
-        "h-full w-full relative overflow-hidden p-6 ease-in-out",
+        "flex flex-col justify-between h-full w-full relative overflow-hidden p-6 ease-in-out",
         isHovered && (gradientData.textColor === "black" ? "text-zinc-900" : "text-zinc-100"),
       )}
       onMouseEnter={() => setIsHovered(true)}
@@ -60,19 +60,19 @@ export default function ArticleCard({ title, description, date }: ArticleCardPro
       <div className="z-10 relative">
         <h3 className="text-xl font-semibold mb-2">{title}</h3>
         <p className="text-sm mb-4">{description}</p>
-        <time
-          className={cn(
-            "text-xs",
-            isHovered
-              ? gradientData.textColor === "black"
-                ? "text-zinc-900"
-                : "text-zinc-200"
-              : "text-zinc-600 dark:text-zinc-400",
-          )}
-        >
-          {date}
-        </time>
       </div>
+      <time
+        className={cn(
+          "text-xs z-10 relative",
+          isHovered
+            ? gradientData.textColor === "black"
+              ? "text-zinc-900"
+              : "text-zinc-200"
+            : "text-zinc-600 dark:text-zinc-400",
+        )}
+      >
+        {date}
+      </time>
       <div
         className={cn("absolute inset-0 bg-cover bg-center", isHovered ? "opacity-100" : "opacity-0")}
         style={{
