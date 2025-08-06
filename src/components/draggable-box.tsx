@@ -35,7 +35,9 @@ function DraggableBox({
 
   const constrainPosition = useCallback(
     (x: number, y: number) => {
-      if (!containerRef.current || !boxRef.current) return { x, y };
+      if (!containerRef.current || !boxRef.current) {
+        return { x, y };
+      }
 
       const container = containerRef.current.getBoundingClientRect();
       const box = boxRef.current.getBoundingClientRect();
@@ -53,7 +55,9 @@ function DraggableBox({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (!containerRef.current || !boxRef.current) return;
+      if (!containerRef.current || !boxRef.current) {
+        return;
+      }
 
       const box = boxRef.current.getBoundingClientRect();
 
@@ -74,7 +78,9 @@ function DraggableBox({
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
-      if (!isDragging || !containerRef.current) return;
+      if (!isDragging || !containerRef.current) {
+        return;
+      }
 
       // Calculate distance moved from start position
       const deltaX = Math.abs(e.clientX - dragStartPos.x);

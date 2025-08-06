@@ -13,7 +13,7 @@ import {
 import { useDocsSearch } from "fumadocs-core/search/client";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
 import { create } from "@orama/orama";
-import { Client } from "fumadocs-core/search/client";
+import type { Client } from "fumadocs-core/search/client";
 
 function initOrama() {
   return create({
