@@ -1,0 +1,24 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "extends": ["@startracex/dev-config/biome"],
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "includes": ["src/**/*.ts", "src/**/*.tsx"],
+    "ignoreUnknown": false
+  },
+  "linter": {
+    "enabled": true
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  }
+}

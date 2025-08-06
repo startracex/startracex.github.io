@@ -22,7 +22,9 @@ export default function WordTransition({
   const intervalRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (words.length === 0) return;
+    if (words.length === 0) {
+      return;
+    }
 
     const updateDisplay = () => {
       const currentTime = Date.now();

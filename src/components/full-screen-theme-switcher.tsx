@@ -27,7 +27,9 @@ export default function FullScreenThemeSwitcher({
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const setTooltipPosition = useCallback((x: number, y: number) => {
-    if (!tooltipRef.current || !rootRef.current) return;
+    if (!tooltipRef.current || !rootRef.current) {
+      return;
+    }
 
     const tooltip = tooltipRef.current;
     const rect = tooltip.getBoundingClientRect();

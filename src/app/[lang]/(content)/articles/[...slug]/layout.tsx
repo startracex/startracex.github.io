@@ -1,6 +1,6 @@
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
-import { PageTree } from "fumadocs-core/server";
+import type { PageTree } from "fumadocs-core/server";
 import { articleSource } from "@/lib/source";
 
 export default async function Layout({

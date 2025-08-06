@@ -1,6 +1,6 @@
 import Heading from "@godown/react/heading.js";
 import defaultComponents from "fumadocs-ui/mdx";
-import { MDXComponents } from "mdx/types";
+import type { MDXComponents } from "mdx/types";
 
 const createHeading =
   (as: 1 | 2 | 3 | 4 | 5 | 6) =>
