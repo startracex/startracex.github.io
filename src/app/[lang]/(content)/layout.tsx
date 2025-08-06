@@ -101,7 +101,7 @@ export default async function Layout({
         ]}
         githubUrl="https://github.com/startracex/startracex.github.io"
       />
-      <div className="p-12 mx-auto w-full max-w-350">{children}</div>
+      <div className="mx-auto w-full max-w-320">{children}</div>
     </RootProvider>
   );
 }

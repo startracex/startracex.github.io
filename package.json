@@ -22,6 +22,7 @@
     "@radix-ui/react-slot": "^1.2.3",
     "@startracex/dev-config": "^0.4.2",
     "class-variance-authority": "^0.7.1",
+    "fmtime": "^0.1.0",
     "framer-motion": "^12.23.12",
     "fumadocs-core": "15.6.9",
     "fumadocs-mdx": "11.7.3",

@@ -9,8 +9,6 @@ const createHeading =
       <Heading
         id={id}
         as={`h${as}`}
-        side="left"
-        className="ml-4"
       >
         {children}
       </Heading>

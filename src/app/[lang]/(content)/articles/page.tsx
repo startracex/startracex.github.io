@@ -4,6 +4,7 @@ import ArticleCard from "@/components/article-card";
 import { staticLangParams } from "@/lib/i18n";
 import { articleSource } from "@/lib/source";
 import { createTranslation } from "@/lib/translation";
+import fmtime from "fmtime";
 
 const translations = {
   "zh-CN": {
@@ -26,14 +27,14 @@ export default async function Page(props: {
 
   const t = createTranslation(translations[lang]);
   return (
-    <div>
+    <div className="pt-12 px-4">
       <div className="flex justify-between items-end mb-8">
         <h1 className="text-4xl font-bold">{t`Articles`}</h1>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {pages.map((page) => {
           const date = isNumerical(page.data.lastModified)
-            ? new Date(page.data.lastModified).toLocaleDateString(lang)
+            ? fmtime("YYYY-MM-DD", new Date(page.data.lastModified))
             : "";
           return (
             <Link

@@ -19,7 +19,7 @@ export default async function Page({
   const { lang } = await params;
   const t = createTranslation(translations[lang]);
   return (
-    <div>
+    <div className="pt-12 px-4">
       <div className="flex justify-between items-end mb-8">
         <h1 className="text-4xl font-bold">{t`Links`}</h1>
       </div>
