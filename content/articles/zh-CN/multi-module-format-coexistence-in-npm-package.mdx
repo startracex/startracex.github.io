@@ -1,0 +1,64 @@
+---
+title: npm 包中的多模块格式共存
+description: 阐释 npm 包中多模块格式 (ESM 和 CJS) 共存的必要性, 模块差异, 以及解决方案
+---
+
+## 多模块格式共存的必要性
+
+在 ESM 规范出现之前, CJS 作为主流模块, 诞生了大量底层包, 到现在, 仍有大量包仅提供 CJS 版本, 不过好在几乎所有运行时和构建工具都可以转换 CJS 到 ESM, 使得 ESM 模块可以正常导入 CJS 模块.
+
+ESM 兴起后, 许多包开始提供 ESM 版本, 但反向兼容却存在障碍, 多数工具不支持将 ESM 转换为 CJS.
+
+即便 ESM 已成为主流, 仍有大量开发者依赖 CJS 生态, 对于仅提供 ESM 格式的包, 下游开发者将无法书写 CJS.
+
+同时支持 ESM 和 CJS 格式的包, 成为平衡兼容性与技术演进的最优解.
+
+## 模块差异
+
+一些内容在 ESM 和 CJS 里存在差异, 大多数转换器不会处理这些行为, 通常需要添加插件进行安全转换.
+
+`__filename` CJS 中直接使用的当前文件路径变量, 在 ESM 中, 使用 `import.meta.filename` 或 `fileURLToPath(import.meta.url)` 代替.
+
+`__dirname` CJS 中的当前目录路径变量, 使用 `import.meta.dirname` 或 `dirname(fileURLToPath(import.meta.url))` 代替.
+
+`require` 将在未来的 ESM 模块中不可用, 即使支持 CJS 模块, 也无法在 ESM 模块中访问, 使用 `createRequire(import.meta.url)` 代替.
+
+对于 `global`, 它不是模块差异, 而是运行时差异.
+
+## 多模块格式共存的实现
+
+对于现代化项目, 最佳实践是: 使用 ESM 编写源代码, 然后使用构建工具转换为 CJS, 为他们配置相同的入口, 根据自定义条件判断使用 ESM 或 CJS 格式.
+
+这需要 package.json 的 exports 字段提供支持, 目前, 绝大多数构建工具和支持 NPM 的 CDN 服务都支持 exports 解析, 可以放心使用.
+
+通常情况下, 将与 module 匹配的格式输出到 `.js` 拓展名, 另外一个格式输出到特定的 `.mjs` 或 `.cjs` 拓展名. 或者, 将两种格式均输出到 `.mjs` 或 `.cjs` 拓展名.
+
+也可能存在其他不需要条件判断的入口, 例如静态文件, package.json, 以及 UMD, AMD 等格式, 这些入口直接指向对应的文件.
+
+在 TypeScript 项目中, ESM 和 CJS 模块格式的 TypeScript, 其生成的类型声明文件通常是一致的, 因此只需要对其中一个格式进行类型声明.
+
+针对以上情况, 我们可以使用以下 package.json 配置:
+
+```json
+{
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts",
+      "require": "./index.cjs"
+    },
+    "./some-file.js": {
+      "import": "./some-file.js",
+      "types": "./some-file.d.ts",
+      "require": "./some-file.cjs"
+    },
+    "./other-format.js": "./other-format.js",
+    "./package.json": "./package.json"
+  }
+}
+```
+
+可补充 main (指向 CJS) 和 module (指向 ESM) 的代码, 不过它的优先级低于 exports, 仅对不支持 exports 的工具或缺失 exports 时有效.
+
+另外, 上述配置中的 types 字段可安全移除, 因为类型文件的主文件名与对应模块文件已保持一致.

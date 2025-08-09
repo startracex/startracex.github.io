@@ -1,0 +1,297 @@
+---
+title: "教程: 从零开始的建站教学"
+description: 给小白和新手的建站教学.
+---
+
+最近刷到不少号称能让完全不懂的小白学会制作网站或博客的教学视频.
+不过这些教程一上来就要求观众购买服务器和域名, 完全不顾实际,
+对于那些连网站基本原理都不清楚的小白, 直接面对购买服务器和域名这些操作, 只会一头雾水, 根本不知道如何下手.
+
+## 先前准备
+
+### 基础原理
+
+我们首先需要了解下 Web 开发的基础原理, 如果你已有了解, 可通过此章节.
+
+再原生开发中, 主要具有三大板块.
+
+HTML: 负责网页的骨架, 通过 HTML 标签定义文档的结构.
+
+CSS: 负责网页的外观, 通过选择器和样式规则美化页面.
+
+JS: 负责网页的交互逻辑, 和动态效果.
+
+其中 HTML 以页面呈现, CSS 和 JS 则通过
+[`<link>`](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/link)
+和 [`<script>`](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/script) 引入或包含.
+
+```html
+<link
+  rel="stylesheet"
+  href="style.css"
+/>
+<script src="script.js"></script>
+```
+
+```html
+<style>
+  p {
+    color: hsl(200 85% 30% / 1);
+  }
+</style>
+<script>
+  const p = document.createElement("p");
+  p.textContent = "Hello, world!";
+  document.body.appendChild(p);
+</script>
+```
+
+#### URL 路径
+
+`src`, `href` 属性用于链接其他文件, 它们应该是基于 URL 的相对路径或绝对路径, 如果它们被设置为 Windows 系统的绝对路径, 或无法处理引入的文件, 将出现预料之外的错误.
+
+对于 JavaScript 模块, 有时你可以使用 [`importmap`](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Reference/Elements/script/type/importmap) 重写导入, 则映射后的值适用上述方法.
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "square": "./shapes/square.js",
+      "circle": "https://example.com/shapes/circle.js"
+    }
+  }
+</script>
+<script type="module">
+  import "square";
+  import("circle");
+</script>
+```
+
+##### Base URL
+
+有些情况下, 你可能不是将目标站点作为根路径, 例如 `example.com` 和 `example.com/docs`.
+
+它们虽然是同一网站, 后者也许是一个独立项目, 此时, 它的 BaseURL 为 `/docs`. 如果它不是独立项目, 则后者是前者的子路径.
+
+##### 美化 URL
+
+你可能发现一些地址类似 `/home`, 一些地址类似 `/home.html` 或其他后缀, 但他们不是静态资源文件.
+
+有多种方式可以实现此种路径:
+
+- 一般情况下, 由提供 HTML 文档的服务器决定.
+
+- 对于静态站点, 许多工具允许你 "美化" URL.
+  一般通过将 `.html` 重定向到去除后缀的 URL, 或者将 `home.html` 移动到 `home/index.html` 实现这种效果.
+
+- 对于单页应用, 则需要使用 JavaScript 根据 URL 进行动态渲染, 并使用 history API 进行导航.
+
+也可能有上述的多个情况组合出现.
+
+#### 域
+
+域用于将一个人类可读的名称映射到服务器地址.
+
+例如 `shiro.wang` 将指向运行此网站的服务器地址.
+
+很多教程会在开始之前要求你准备一个域名, 不过这不要紧, 只有你需要自己的域名, 才需要前往域名注册商并注册一个.
+
+很多站点服务平台都会在部署到其平台之后为你提供二级或更长子域, 例如 `*.github.io`, `*.vercel.app`.
+
+[有一些服务](https://github.com/js-org/js.org/wiki/Similar-Services) 也提供免费的二级子域.
+
+也有很多免费的域名注册商.
+例如 `freenom` 提供 `.tk`, `.ml`, `.ga`, `.cf`, `.gq` 的一级域名;
+`eu.org` 提供 `eu.org` 的二级域名, 但它被很多 DNS 服务视作顶级域名, 可作为一级域名使用.
+
+### 选择适合的建站工具
+
+对于网站建设, 主流的工具框架都集中在 JavaScript 生态系统.
+
+也有使用其他编程语言实现的工具, 它们通常会嵌入 JavaScript 代码, 或者要求你自行编写 JavaScript 代码.
+
+市面上有非常多的工具和框架可用于网站构建, 我们可以将它分为以下类别.
+
+#### 原生开发
+
+手动编写 HTML, CSS, JavaScript 等代码. 是最贴近网页本质的开发方式, 也是所有建站技术的基础.
+
+如果你没有任何编程基础, 可从此开始, 其他工具容易掩盖底层原理, 当你了解这些内容后, 再切换为其他方式.
+
+#### 静态站点生成器 (SSG)
+
+如 Astro, Hugo, Next.js 等, 它们可以将站点构建成静态文件.
+
+也包括一些 Nextra, Starlight, Vitepress 这些文档生成器, 没有前面提到的生成器自由, 但更专注于文档生成, 更适用于搭建博客或文档.
+
+#### 内容管理系统 (CMS)
+
+如 Wordpress, Joomla, Drupal 等, 可以方便地管理内容.
+
+一些 CMS 会提供可视化的内容, 你可以将其直接作为网站. 或者使用一些无头 CMS, 仅进行内容管理, 对于网站构建, 使用其他方式.
+
+#### 使用编程语言, 库和框架
+
+如 Next.js, Nuxt.js, SvelteKit 等.
+
+这些技术这可能需要一定的学习成本. 但能解锁更强大的功能. 当你需要更复杂的交互功能, 或者希望完全掌控网站的每一个细节时, 这将成为最优选择.
+
+#### 使用 AI 或低代码平台生成
+
+有像 Bolt, V0 这样的 AI 平台, 它们可以根据你的需求生成前端或全栈代码. 若要能够上手其生成的内容, 可能需要了解[前面的内容](#使用编程语言和框架).
+
+### 上手开发
+
+无论使用何种开发方式, 你都需要具有代码编辑器或集成开发环境, 对于 Web 开发, 你可以尝试 [VSCode](https://code.visualstudio.com) 和 [WebStorm](https://www.jetbrains.com/zh-cn/webstorm)
+
+如果你使用原生开发, 通常需要手动刷新网页, 你可以使用 [`Live Server`](https://marketplace.visualstudio.com/items?itemName=live-servers.LiveeServer) 插件, 他将监听文件变更并刷新网页.
+
+大多数 JavaScript 框架可能会使用 [Rollup](https://cn.rollupjs.org), [Webpack](https://webpack.js.org/) 等的打包/构建工具及其插件进行实时刷新和 JavaScript 模块热替换.
+
+其他构建方式一般也会通过监听文件变更的方式, 进行增量构建. 一些快速的本机语言工具甚至会进行全量构建.
+
+事实上, 实际的部署于开发阶段的预览比较相似, 只不过处于开发环境下, 由私有设备提供 Web 服务, 仅提供本地预览, 没有文件压缩.
+
+### 常见问题与解决方案
+
+- ?
+
+我正在收集开发中的常见问题, 你可以通过联系我并提供问题, 此文章可能在将来更新此部分.
+
+## 撰写文章
+
+如果你需要发布文章或文档, 用 HTML 来写这些内容可不是一个好的选择, 你需要一种像 Markdown 这样更轻量化的标记语言.
+
+如果你无需上述这些内容, 可跳过此环节.
+
+Markdown 无法直接渲染到页面上, 你或你的工具必须将其输出为 HTML.
+
+因此, 我们使用 Markdown 来书写文章, 并将其转换为 HTML 后部署到网站上, 就像你看到的这篇文章一样.
+
+那么你需要选择一种标记语言, 如 Markdown, 大多数 SSG 都会默认支持 Markdown, 它们会自动将 Markdown 转换为 HTML.
+
+对于其他方式, 可以使用一些转换工具将 Markdown 转换为 HTML, 例如 `markdown-it`, `marked`, `micromark`, `remark` 等.
+
+## 部署或托管你的网站
+
+是否具备后端服务器具有很大的不同, 我们将据此划分为静态部署 (不具有后端服务器) 和动态部署 (具有后端服务器).
+
+### 静态部署
+
+有很多站点都支持静态部署, 如 Cloudflare Pages, GitHub Pages, Netlify, Vercel 等.
+
+我们将以 GitHub Pages 为例. 首先, 你需要确定静态文件的根目录, 如果你不使用生成器或构建工具.
+
+首先, 你需要在 GitHub 上创建一个仓库, 如果你希望 GitHub Pages 部署你的网站到 `https://<用户名>.github.io`, 那么仓库名应该是 `<用户名>.github.io`.
+
+否则, 它将是 `https://<用户名>.github.io/<仓库名>`.
+
+你需要前往 Settings 选项卡, 找到 Pages 子选项, 在仓库的设置中开启 GitHub Pages. 它有两种方式, 一种是通过分支构建, 另一个是使用工作流构建.
+
+- 通过分支构建, 你需要将 Source 选择为 `Deploy from a branch`, 然后选择你的分支.
+  目录仅能够选择 `/` 或 `/docs`, 如果需要使用其他目录, 则尝试将目标目录作为根推送到 GitHub, 并将目录设置为 `/`.
+
+- 通过工作流构建, 你需要创建一个工作流, 前往 Actions 选项卡, 选择新建一个工作流 (New workflow).
+  GitHub 将显示一个工作流模板列表, 在这里找到 `Pages > Static HTML`.
+  它的内容应该是下面这样的, 如果你没有找到, 则创建 `.github/workflows/static.yml`, 并写入下述内容.
+
+  ```yml title=".github/workflows/static.yml"
+  # Simple workflow for deploying static content to GitHub Pages
+  name: Deploy static content to Pages
+
+  on:
+    # Runs on pushes targeting the default branch
+    push:
+      branches: ["main"]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+  # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+  # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+  # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+  concurrency:
+    group: "pages"
+    cancel-in-progress: false
+
+  jobs:
+    # Single deploy job since we're just deploying
+    deploy:
+      environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Setup Pages
+          uses: actions/configure-pages@v5
+        - name: Upload artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            # Upload entire repository
+            path: "."
+        - name: Deploy to GitHub Pages
+          id: deployment
+          uses: actions/deploy-pages@v4
+  ```
+
+  你可能需要修改 `Upload artifact` 步骤的 path 参数, 它是你需要部署的根目录, 目前是仓库的根目录.
+
+然后, 你需要将静态文件推送到这个仓库. 你可以使用 Git, GitHub CLI, 或者使用 GitHub 提供的网页界面, 只要能够将静态文件推送到仓库即可.
+
+如果你不使用 GitHub Pages, 上述提到的其他工具也可以从 Git 托管平台导入 Git 仓库.
+
+### 动态部署
+
+有很多服务提供动态部署的功能, 如 Deno, Netlify, Vercel, Render 等, 这些平台操作比较简短.
+
+只需要链接你的 GitHub 账户, 然后选择需要部署的项目, 它们可以自动推断所使用的框架和库, 构建命令, 输出,目录等.
+
+由于这些服务对于非 `TypeScript/JavaScript` 项目具有很大局限性, 或者需要自托管的情况下, 你需要使用自己的服务器进行部署.
+
+若要使用自己的服务器进行部署, 主要的流程如下:
+
+初始化: 登录服务器, 安装和升级所需要的软件包, 如服务器, 数据库等.
+
+将文件用 FTP 传输或从 git 仓库克隆到给服务器, 你可以:
+
+- 将本地源代码提供给服务器, 并在远程构建.
+- 将构建完成的文件提供给服务器
+
+启动你的网站服务器.
+
+对你的服务器的进行设置, 如绑定域名, 配置端口等.
+
+## Fork 这个项目
+
+如果你一直没有好的方案或模板, 也可以从修改这个网站开始, 此网站的源代码位于[这里](https://github.com/startracex/startracex.github.io).
+
+在此之前, 你需要安装一个本机 JavaScript 运行时, 例如 [`Node.js`](https://nodejs.org/zh-cn/download);
+以及 [`pnpm`](https://pnpm.io/zh/installation) 作为包管理器, 并且网站源代码克隆或下载到本地.
+
+你也可以使用 [StackBlitz](https://stackblitz.com) 这种在线开发环境, 无需在本地安装上述内容.
+
+前往源代码的根目录, 运行 `pnpm i` 以安装依赖, 安装完成之后, 运行 `pnpm dev` 启动开发服务器, [localhost:3000](http://localhost:3000), 应当呈现此网站的首页.
+
+你可以将这些内容删除或修改成你自己的内容:
+
+- `https://github.com/startracex/startracex.github.io`, 这是仓库的链接.
+- `shiro.wang` 和 `startracex.github.io`, 这是此网站的域.
+- `Shiro`, `Wang`, `Shiro Wang` 和 `startracex` 这些是作者名称.
+- `content/articles` 目录下的内容, 这是包括此文在内的所有文章.
+
+运行 `pnpm build` 为生成环境进行构建, 若要使用独立构建, 则替换为 `pnpm build:standalone`.
+
+构建完成后可以运行 `pnpm start` 或 `pnpm start:standalone` 启动.
+
+如果需要使用静态站点生成, 输出为静态文件, 则使用 `pnpm build:export`.
+
+## 添加你的链接
+
+如果此文对你有所帮助, 你可以添加你最终的网页链接到此站, 请参考[这篇文章](./add-your-link.mdx)

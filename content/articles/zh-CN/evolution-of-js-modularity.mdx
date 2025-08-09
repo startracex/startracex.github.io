@@ -1,0 +1,143 @@
+---
+title: JavaScript 模块演进史
+description: JavaScript 模块化的发展历程
+---
+
+JavaScript 在早期作为页面交互的脚本, 在设计之初没有考虑模块化.
+
+因此早期开发者不得不在全局范围进行开发. 并手动维护脚本的导入顺序.
+
+## 命名空间
+
+早期阶段, JavaScript 文件常见将需要"导出"的内容复制在一个特有命名的全局变量中, 这是最简单的模块化方式.
+
+```js title="my-module.js"
+var myModule = {
+  count: 100,
+  increase: () => myModule.count++,
+};
+```
+
+```html
+<script src="my-module.js"></script>
+<script>
+  myModule.increase();
+</script>
+```
+
+## 立即执行函数 (IIFE)
+
+由于需要将模块声明在全局, 常会有代码在顶层作用域声明变量.
+
+但顶层的 `var` 声明将会提升到全局作用域.
+
+不像现在可以使用 `let` 声明和严格模式阻止此情况, 为了防止这些变量的意外提升, 可以将它们包裹在立即执行函数里.
+
+一个立即执行函数类似这样:
+
+```js title="my-module.js"
+var myModule = (function (exports) {
+  "use strict";
+
+  exports.count = 100;
+  const increase = () => exports.count++;
+
+  exports.increase = increase;
+
+  return exports;
+})({});
+```
+
+## CommonJS 模块
+
+2009 年, CommonJS 小组提出了 CommonJS 模块规范, 主要用于服务器端.
+
+在 Node.js 中, 使用此模块规范.
+
+一个 CommonJS 模块类似这样:
+
+```js title="my-module.js"
+"use strict";
+
+exports.count = 100;
+const increase = () => exports.count++;
+
+exports.increase = increase;
+```
+
+## AMD 模块
+
+CommonJS 出现之后, 由于模块使用同步加载, 在服务端不会出现性能问题, 但在浏览器环境, 这可能导致渲染阻塞.
+
+为解决此问题, RequireJS 主导提出了 AMD 模块, 主要用于自动依赖管理和异步加载模块.
+
+一个 AMD 模块类似这样:
+
+```js title="my-module.js"
+define(["exports"], function (exports) {
+  "use strict";
+
+  exports.count = 100;
+  const increase = () => exports.count++;
+
+  exports.increase = increase;
+});
+```
+
+## UMD 模块
+
+由于常有在不同环境 (浏览器和 Node) 运行相同代码, 则常需要判断当前的环境, 以执行不同的代码.
+
+为了使一套代码运行在不同环境, UMD 为此设计. 并在不同环境使用不同的模块加载器: 在浏览器环境使用 AMD 或 全局命名空间, 在服务器环境使用 CommonJS.
+
+一个 UMD 模块类似这样:
+
+```js title="my-module.js"
+(function (global, factory) {
+  typeof exports === "object" && typeof module !== "undefined"
+    ? factory(exports)
+    : typeof define === "function" && define.amd
+      ? define(["exports"], factory)
+      : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), factory((global.myModule = {})));
+})(this, function (exports) {
+  "use strict";
+
+  exports.count = 100;
+  const increase = () => exports.count++;
+
+  exports.increase = increase;
+});
+```
+
+## ECMAScript 模块
+
+直到 2015 年, ECMAScript 6 引入了模块系统, 这是 JavaScript 第一次有官方的模块系统.
+
+它使用 `import` 和 `export` 关键字声明导入和导出, 不同于其他模块规范们允许对导出内容进行动态修改, ECMAScript 模块的导出内容是静态的, 因此此模块能够对导出内容进行摇树优化.
+
+一个 ECMAScript 模块类似这样:
+
+```js title="my-module.js"
+export const count = 100;
+export const increase = () => count++;
+```
+
+## SystemJS 模块
+
+SystemJS 主要用于将 ESM、CJS 等模块转换为浏览器可直接运行的代码.
+
+在浏览器还未支持 ESM 的期间, SystemJS 则用于填补这一空白, 在浏览器支持了 ESM 后, SystemJS 的使用率已大幅下降.
+
+一个 SystemJS 模块类似这样:
+
+```js title="my-module.js"
+System.register("myModule", [], function (exports) {
+  "use strict";
+  return {
+    execute: function () {
+      let count = exports("count", 100);
+      const increase = exports("increase", () => (exports("count", count + 1), count++));
+    },
+  };
+});
+```

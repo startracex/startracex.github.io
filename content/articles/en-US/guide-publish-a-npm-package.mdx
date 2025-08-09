@@ -1,0 +1,319 @@
+---
+title: "Guide: publish an npm package"
+description: Publishing an npm package from GitHub Action to the npmjs registry, step by step
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+
+This tutorial will walk you through publishing a basic npm package from GitHub Action to the npmjs registry.
+
+To keep things simple, we won't cover additional tools like code linting, formatting, testing, or packaging. However, we will include type declarations, publication origins, and other necessary elements.
+
+Links in this article use `<user>` and `<repo>` as placeholders. Please replace them when navigating.
+
+## Prerequisites
+
+You'll need an npm account and a GitHub account for publishing packages. Git is used for code management, and any JS package manager can be used for dependency management.
+
+[Create a repository](https://github.com/new) on GitHub, where you can choose a suitable license.
+
+After completing the above steps, clone the repository locally or connect your local repository to the remote.
+
+## Initialize Project Configuration
+
+Create a package.json file, which contains metadata for your package. Since package names must be unique, check for existing packages or similar names before creating to avoid publication failures.
+
+To avoid conflicts with other packages, you can add a scope to your package name.
+
+You have permission to use scopes with your username, or you can create an organization and publish packages under the organization scope.
+
+Our initial package.json looks like this. Replace certain values with your actual information:
+
+```json title="package.json"
+{
+  "name": "@scope/pkg",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {},
+  "author": "you",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/<user>/<repo>.git"
+  }
+}
+```
+
+Since we're publishing a package with type declarations, we need to install TypeScript.
+
+```package-install
+npm i -D typescript
+```
+
+Create a basic tsconfig.json file for TypeScript configuration with the following settings:
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"]
+}
+```
+
+## Write Core Functionality Code
+
+We'll implement a simple date formatting utility:
+
+```ts title="src/utils.ts"
+function padNumberArray(n: number, padLen = 2): string[] {
+  return n.toString().padStart(padLen, "0").split("");
+}
+
+export function createKeyCharMap(date: Date): Record<string, string[]> {
+  const z = date.getTimezoneOffset() / -60;
+  return {
+    Z: [z === 0 ? "0" : z > 0 ? `+${z}` : `-${z}`],
+    Y: padNumberArray(date.getFullYear()),
+    M: padNumberArray(date.getMonth() + 1),
+    D: padNumberArray(date.getDate()),
+    h: padNumberArray(date.getHours()),
+    m: padNumberArray(date.getMinutes()),
+    s: padNumberArray(date.getSeconds()),
+    S: padNumberArray(date.getMilliseconds(), 3),
+  };
+}
+
+export function format(fmt: string, km: Record<string, string[]>, escape: string): string {
+  const escapeReplacement = escape + escape;
+  const rest: string[] = [];
+  const fmtLen = fmt.length;
+  const fmtChars = Array.from(fmt);
+  for (let i = 0; i < fmtLen; i++) {
+    if (fmtChars[i] === escape) {
+      const nextChar = fmtChars[i + 1];
+      if (nextChar && (nextChar === escape || nextChar in km)) {
+        rest.push(nextChar);
+        fmtChars[i] = escapeReplacement[0];
+        fmtChars[i + 1] = escapeReplacement[1];
+        i++;
+      }
+    }
+  }
+  const finalChars: string[] = new Array(fmtLen);
+  for (let i = fmtLen - 1; i >= 0; i--) {
+    const fmtChar = fmtChars[i];
+    finalChars[i] = km[fmtChar]?.pop() ?? fmtChar;
+  }
+  let restIndex = 0;
+  const output: string[] = new Array(fmtLen);
+  for (let i = 0; i < fmtLen; i++) {
+    if (finalChars[i] === escape && finalChars[i + 1] === escape) {
+      output[i] = rest[restIndex];
+      restIndex++;
+      i++;
+    } else {
+      output[i] = finalChars[i];
+    }
+  }
+  return output.join("");
+}
+```
+
+```ts title="src/index.ts"
+import { format, createKeyCharMap } from "./utils.js";
+
+export function fmtime(fmt: string, date: Date = new Date(), escape: string = "%"): string | undefined {
+  if (!fmt) {
+    return fmt;
+  }
+  if (isNaN(date.getTime())) {
+    return undefined;
+  }
+  return format(fmt, createKeyCharMap(date), escape);
+}
+```
+
+## Configure Build and Output
+
+Now that the source code is complete, add a build script to convert it to JavaScript. Running the `build` script will build the package.
+
+```json title="package.json"
+{
+  "scripts": {
+    "build": "tsc"
+  }
+}
+```
+
+Most JS packages output their build artifacts to a separate directory. To do this, add outDir to tsconfig.json:
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  }
+}
+```
+
+JavaScript files and source maps will be output to the dist directory, which is a common artifacts directory and should be ignored by .gitignore.
+
+```plain title=".gitignore"
+node_modules
+dist
+```
+
+## Declare Module Entry Points
+
+We also need to declare entry points in package.json:
+
+```json title="package.json"
+{
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils.js": "./dist/utils.js"
+  }
+}
+```
+
+This allows users to import our modules using `import "@scope/pkg"` and `import "@scope/pkg/utils.js"`.
+
+## Write Documentation
+
+Create a readme file that will serve as documentation for your package and appear on its homepage, for example:
+
+````md title="readme.md"
+# @scope/pkg
+
+```sh
+npm i @scope/pkg
+```
+
+```js
+import { fmtime } from "@scope/pkg";
+
+fmtime("YYYY-DD-MM hh:mm:ss");
+```
+````
+
+## Specify Published Files
+
+Determine which files to publish. We use the files field to limit published files, or you can use an .npmignore file.
+If neither exists, .gitignore rules will be used.
+You don't need to specify package.json, readme.md, or license as they are automatically included in published packages.
+
+```json title="package.json"
+{
+  "files": ["src", "dist"]
+}
+```
+
+## Publish
+
+create a npm token for publishing:
+
+- Create a classic token at `https://www.npmjs.com/settings/<user>/tokens/new`
+- Or create a granular access token at `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new`
+
+Go to `https://github.com/<user>/<repo>/settings/secrets/actions/new` to add a secret to the repository. The name can be NPM_TOKEN or a similar variable name.
+The subsequent steps remain the same. The value is the token created in the previous step.
+
+Go to `https://github.com/<user>/<repo>/settings/actions` and grant read and write permissions to the workflow.
+
+Add a [GitHub Action](https://docs.github.com/actions) workflow that will automatically publish the package when a Release is published.
+
+```yml title=".github/workflows/publish.yml"
+name: Publish to npmjs
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm install
+      - run: npm run build
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+`actions/setup-node` only includes npm and yarn@1. If you use other package managers, refer to their respective workflow documentation or install them manually.
+
+When `registry-url` is set, `actions/setup-node` [uses `env.NODE_AUTH_TOKEN` as the login token by default](https://github.com/actions/setup-node/?tab=readme-ov-file#usage).
+You can change this behavior by running `npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}` in the workflow.
+
+### access
+
+access can be `restricted` (default) or `public`, and can be set in these ways:
+
+- Pass the `--access public` parameter when executing the publish command
+- Modify package.json:
+  ```json title="package.json"
+  {
+    "publishConfig": {
+      "access": "public"
+    }
+  }
+  ```
+
+### provenance
+
+provenance is used to prove to npm that the package was published from the specified repository and can be enabled in these ways:
+
+- Pass the `--provenance` parameter when executing the publish command
+- Set the environment variable `NPM_CONFIG_PROVENANCE: true`
+- Set npm config: `npm config set provenance true`
+- Modify package.json:
+  ```json title="package.json"
+  {
+    "publishConfig": {
+      "provenance": true
+    }
+  }
+  ```
+
+## Final Directory Structure and Publication Process
+
+Our directory structure should look like this:
+
+<Files>
+  <Folder name=".github">
+    <Folder name="workflows">
+      <File name="publish.yml" />
+    </Folder>
+  </Folder>
+  <Folder
+    name="src"
+    defaultOpen
+  >
+    <File name="index.ts" />
+    <File name="utils.ts" />
+  </Folder>
+  <File name=".gitignore" />
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+Now, go to `https://github.com/<user>/<repo>/releases/new` to publish a Release. The Action should publish the package correctly.
+
+After publication, you can view the published package on npmjs.

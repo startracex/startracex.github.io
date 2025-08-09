@@ -1,0 +1,104 @@
+---
+title: Evolution of Style scoping isolation
+description: "The Evolution of Style Isolation: From Naming Conventions to Web Standards"
+---
+
+There are two major challenges in computer science: cache invalidation and naming conflicts. In early web development, as components multiplied, finding unique and appropriate names for different styles became increasingly complex, giving rise to the need for style isolation.
+
+## Naming Conventions
+
+In the 2000s, some developers used naming conventions for manual isolation, such as BEM (Block\_\_Element--Modifier), OOCSS, and SMACSS.
+
+These approaches focus on abstracting styles into reusable names, though not as granular as atomic styling, and are the most accessible isolation methods.
+
+This isolation approach has a long history but hasn't been completely abandoned; major libraries like Bootstrap and Ant Design still incorporate or partially use this isolation method.
+
+## Dynamic Styling
+
+Dynamic style insertion through DOM API manipulation generates complex selectors to avoid naming conflicts.
+Frequently generating numerous styles for various states or extensively modifying styles based on state changes results in significant performance overhead.
+
+## Framework Style Isolation
+
+Some frontend frameworks include built-in style isolation solutions that enable style scoping without altering original styles.
+
+### Attribute Isolation (e.g., Angular and Vue)
+
+Unique markers like `data-v-*` and `_ngcontent` are added to components applying styles, and these attributes are appended to style selectors during build or rendering.
+
+### Full Path Selectors (e.g., Riot)
+
+Style selectors are generated as full paths from the document root to the component applying styles, ensuring styles only match elements under that path.
+
+The advantage of this approach is simplicity, requiring no additional build steps.
+Its disadvantages include performance issues from runtime DOM tree traversal and style selector generation, often resulting in more verbose styles than attribute isolation.
+
+## CSS Modules
+
+CSS Modules are a technique for localizing CSS class names, requiring CSS files to end with `.module.css`. They hash class names to generate unique identifiers.
+
+With build tool support, we can scope styles without changing original class names and convert classes to deterministic objects during the build phase.
+
+Each CSS Module thus consists of: a stylesheet to be inserted into the document, and a JS object for mapping class names.
+
+### Integration with Naming Conventions
+
+Even when using CSS Modules, many applications still use BEM naming conventions to standardize class names within modules.
+BEM clearly expresses component structure and state, making it easy to distinguish different elements and modifiers. Without class names, styles can easily leak to child elements.
+
+## Web Standards
+
+### @scope Rule
+
+The @scope is a new CSS rule that allows defining precise scopes.
+
+```css
+@scope (scope root) {
+}
+@scope (scope root) to (scope limit) {
+}
+```
+
+@scope can also be inline within style elements, offering flexible usage.
+
+```html
+<div>
+  <style>
+    @scope {
+    }
+  </style>
+</div>
+```
+
+Unfortunately, browser compatibility for this rule is too low for widespread adoption.
+For unsupported devices, you can try [this Polyfill](https://github.com/samthor/scoped).
+
+### Shadow DOM
+
+Shadow DOM allows creating independent subtree for elements, with internal styles completely isolated from the main document.
+
+Only CSS variables, some CSS rules, and `::part` selectors can penetrate Shadow DOM.
+
+While Shadow DOM is an excellent solution, it's often overlooked by mainstream tools.
+Many projects add styles that affect Shadow DOM, such as using global wildcard styles:
+
+```css
+* {
+  border: 0;
+}
+```
+
+This breaks styles for web components that declare border styles, yet it's become the default behavior for many libraries.
+
+The ideal approach is to reset styles only for specific elements, for example:
+
+```css
+input,
+textarea,
+select,
+button,
+fieldset,
+iframe {
+  border: 0;
+}
+```

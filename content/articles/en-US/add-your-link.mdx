@@ -1,0 +1,33 @@
+---
+title: Add Your Link
+description: Add your link to this website
+---
+
+My website has a new page for friend links, and you can also add your own website link.
+
+You need to fork this repository, then add your link to `src/app/[lang]/(content)/links/_data.ts`, and open a PR.
+When adding a link, place the new link before Example, so all new links will be sorted by the order of addition, with Example at the end.
+
+A link format is as follows:
+
+```js
+{
+  name: {
+    "en-US": "Example",
+    "zh-CN": "示例",
+  },
+  description: {
+    "en-US": "Example website",
+    "zh-CN": "示例网站",
+  },
+  url: "https://example.com",
+  preview: "/placeholder.svg",
+  languages: ["English"],
+}
+```
+
+`preview` is the preview image of the link. You can take a screenshot and save it in the `public` directory, or use your own image hosting service. The display ratio is 8:5.
+
+If you don't want to use this method, you can also contact me directly and provide the above information, and I will add it for you.
+
+After adding, during the next deployment, the link will be displayed on the [/en-US/links](/en-US/links) page.
