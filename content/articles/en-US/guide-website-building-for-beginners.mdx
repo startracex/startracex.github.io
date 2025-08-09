@@ -1,0 +1,297 @@
+---
+title: "Guide: website building for beginners"
+description: A website building tutorial for beginners and newcomers.
+---
+
+Recently, I've come across many tutorial videos claiming to teach complete beginners how to create websites or blogs.
+However, these tutorials immediately ask viewers to purchase servers and domain names without considering the practical situation.
+For beginners who don't even understand the basic principles of websites, facing tasks like purchasing servers and domain names will only leave them confused and not knowing where to start.
+
+## Preparation
+
+### Basic Principles
+
+First, we need to understand the basic principles for web development. If you're already familiar with these, you can skip this section.
+
+In native development, there are three main components:
+
+HTML: Responsible for the structure of the webpage, defining the document structure through HTML tags.
+
+CSS: Responsible for the appearance of the webpage, beautifying the page through selectors and style rules.
+
+JS: Responsible for the interactive logic and dynamic effects of the webpage.
+
+HTML is presented as pages, while CSS and JS are included or referenced through
+[`<link>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/link)
+and [`<script>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script) elements.
+
+```html
+<link
+  rel="stylesheet"
+  href="style.css"
+/>
+<script src="script.js"></script>
+```
+
+```html
+<style>
+  p {
+    color: hsl(200 85% 30% / 1);
+  }
+</style>
+<script>
+  const p = document.createElement("p");
+  p.textContent = "Hello, world!";
+  document.body.appendChild(p);
+</script>
+```
+
+#### URL Paths
+
+The `src` and `href` attributes are used to link other files. They should be URL-based relative or absolute paths. If they are set to Windows absolute paths or cannot process the referenced files, unexpected errors will occur.
+
+For JavaScript modules, you can sometimes rewrite imports using [`importmap`](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap), and the mapped values follow the above method.
+
+```html
+<script type="importmap">
+  {
+    "imports": {
+      "square": "./shapes/square.js",
+      "circle": "https://example.com/shapes/circle.js"
+    }
+  }
+</script>
+<script type="module">
+  import "square";
+  import("circle");
+</script>
+```
+
+##### Base URL
+
+In some cases, you may not be targeting the site as the root path, such as `example.com` and `example.com/docs`.
+
+Although they are the same website, the latter may be an independent project, in which case its BaseURL is `/docs`. If it's not an independent project, the latter is a subpath of the former.
+
+##### Beautify URLs
+
+You may notice some addresses like `/home` and some like `/home.html` or other suffixes, but they are not static resource files.
+
+There are several ways to implement such paths:
+
+- Generally, it's determined by the server providing the HTML document.
+
+- For static sites, many tools allow you to "beautify" URLs.
+  This is typically achieved by redirecting `.html` to URLs without suffixes or moving `home.html` to `home/index.html`.
+
+- For single-page applications, you need to use JavaScript to dynamically render based on the URL and use the history API for navigation.
+
+It's also possible to have combinations of the above scenarios.
+
+#### Domains
+
+A domain is used to map a human-readable name to a server address.
+
+For example, `shiro.wang` points to the server address where this website is running.
+
+Many tutorials ask you to prepare a domain name before starting, but it's not necessary. You only need to go to a domain registrar and register one if you want your own domain.
+
+Many site service platforms provide subdomains after deployment, such as `*.github.io`, `*.vercel.app`.
+
+[Some services](https://github.com/js-org/js.org/wiki/Similar-Services) also offer free subdomains.
+
+There are also many free domain registrars.
+For example, `freenom` offers first-level domains like `.tk`, `.ml`, `.ga`, `.cf`, `.gq`;
+`eu.org` provides second-level domains with `eu.org`, but it's treated as a top-level domain by many DNS services and can be used as a first-level domain.
+
+### Choosing the Right Tools
+
+For website building, mainstream tools and frameworks are concentrated in the JavaScript ecosystem.
+
+There are also tools implemented in other programming languages, which usually embed JavaScript code or require you to write JavaScript code yourself.
+
+There are numerous tools and frameworks available for website building, which can be categorized as following.
+
+#### Native Development
+
+Manually writing HTML, CSS, JavaScript, etc. This is the most close-to-essence way of web development and the foundation of all website building techniques.
+
+If you have no programming foundation, you can start here. Other tools tend to obscure the underlying principles. Once you understand these concepts, you can switch to other methods.
+
+#### Static Site Generators (SSG)
+
+Such as Astro, Hugo, Next.js, etc., which can build sites into static files.
+
+This also includes documentation generators like Nextra, Starlight, and Vitepress, which are less flexible than the generators mentioned earlier but more focused on documentation generation, making them more suitable for building blogs or documentation.
+
+#### Content Management Systems (CMS)
+
+Such as WordPress, Joomla, Drupal, etc., which allow for easy content management.
+
+Some CMS platforms provide visual content that you can use directly as a website. Or you can use headless CMS for content management only and use other methods for website building.
+
+#### Using Programming Languages, Libraries, and Frameworks
+
+Such as Next.js, Nuxt.js, SvelteKit, etc.
+
+These technologies may require a certain learning curve but unlock more powerful features. When you need more complex interactive functions or want complete control over every detail of your website, this becomes the best choice.
+
+#### Using AI or Low-Code Platforms
+
+There are AI platforms like Bolt and V0 that can generate frontend or full-stack code based on your requirements. To be able to work with the content they generate, you may need to understand [the previous content](#using-programming-languages-and-frameworks).
+
+### Getting Started with Development
+
+Regardless of the development method, you need a code editor or integrated development environment. For web development, you can try [VSCode](https://code.visualstudio.com) and [WebStorm](https://www.jetbrains.com/webstorm)
+
+If you're using native development, you usually need to manually refresh the webpage. You can use the [`Live Server`](https://marketplace.visualstudio.com/items?itemName=live-servers.LiveeServer) extension, which monitors file changes and refreshes the webpage.
+
+Most JavaScript frameworks may use bundling/building tools like [Rollup](https://rollupjs.org), [Webpack](https://webpack.js.org/) and their plugins for live reloading and JavaScript hot module replacement.
+
+Other build methods generally also perform incremental builds by monitoring file changes. Some fast native language tools may even perform full builds.
+
+In fact, actual deployment is similar to development stage preview, except that in the development environment, web services are provided by private devices for local preview only, without file compression.
+
+### Common Issues and Solutions
+
+- ?
+
+I'm collecting common issues during development. You can contact me to provide issues, and this article may be updated in the future with this section.
+
+## Writing Articles
+
+If you need to publish articles or documentation, writing them in HTML is not a good choice. You need a lighter markup language like Markdown.
+
+If you don't need this content, you can skip this section.
+
+Markdown cannot be directly rendered on a page; you or your tools must convert it to HTML.
+
+Therefore, we write articles in Markdown and convert them to HTML before deploying them to the website, just like the article you're reading now.
+
+You need to choose a markup language like Markdown. Most SSGs support Markdown by default and will automatically convert it to HTML.
+
+For other methods, you can use conversion tools to convert Markdown to HTML, such as `markdown-it`, `marked`, `micromark`, `remark`, etc.
+
+## Deploying or Hosting Your Website
+
+Whether you have a backend server makes a big difference. We divide it into static deployment (without a backend server) and dynamic deployment (with a backend server).
+
+### Static Deployment
+
+Many platforms support static deployment, such as Cloudflare Pages, GitHub Pages, Netlify, Vercel, etc.
+
+We'll use GitHub Pages as an example. First, you need to determine the root directory of your static files if you're not using a generator or build tool.
+
+First, you need to create a repository on GitHub. If you want GitHub Pages to deploy your website to `https://<username>.github.io`, the repository name should be `<username>.github.io`.
+
+Otherwise, it will be `https://<username>.github.io/<repository-name>`.
+
+You need to go to the Settings tab, find the Pages sub-option, and enable GitHub Pages in the repository settings. There are two ways: deploying from a branch or using a workflow.
+
+- For branch deployment, select `Deploy from a branch` as the Source, then choose your branch.
+  The directory can only be `/` or `/docs`. If you need to use another directory, try pushing the target directory as the root to GitHub and set the directory to `/`.
+
+- For workflow deployment, you need to create a workflow. Go to the Actions tab and select New workflow.
+  GitHub will display a list of workflow templates. Find `Pages > Static HTML` here.
+  The content should look like the following. If you can't find it, create `.github/workflows/static.yml` and write the following content.
+
+  ```yml title=".github/workflows/static.yml"
+  # Simple workflow for deploying static content to GitHub Pages
+  name: Deploy static content to Pages
+
+  on:
+    # Runs on pushes targeting the default branch
+    push:
+      branches: ["main"]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+  # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+  permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+  # Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+  # However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+  concurrency:
+    group: "pages"
+    cancel-in-progress: false
+
+  jobs:
+    # Single deploy job since we're just deploying
+    deploy:
+      environment:
+        name: github-pages
+        url: ${{ steps.deployment.outputs.page_url }}
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+        - name: Setup Pages
+          uses: actions/configure-pages@v5
+        - name: Upload artifact
+          uses: actions/upload-pages-artifact@v3
+          with:
+            # Upload entire repository
+            path: "."
+        - name: Deploy to GitHub Pages
+          id: deployment
+          uses: actions/deploy-pages@v4
+  ```
+
+  You may need to modify the path parameter in the `Upload artifact` step, which is the root directory you want to deploy, currently the repository's root directory.
+
+Then, you need to push your static files to this repository. You can use Git, GitHub CLI, or the web interface provided by GitHub, as long as you can push the static files to the repository.
+
+If you don't use GitHub Pages, the other tools mentioned above can also import Git repositories from Git hosting platforms.
+
+### Dynamic Deployment
+
+Many services offer dynamic deployment capabilities, such as Deno, Netlify, Vercel, Render, etc. These platforms have relatively short operations.
+
+You just need to link your GitHub account, then select the project you want to deploy. They can automatically infer the framework and libraries used, build commands, output directories, etc.
+
+Since these services have significant limitations for non-`TypeScript/JavaScript` projects, or if you need self-hosting, you need to deploy using your own server.
+
+To deploy using your own server, the main process is as follows:
+
+Initialization: Log in to the server, install and upgrade required software packages such as servers, databases, etc.
+
+Transfer files to the server via FTP or clone from a Git repository. You can:
+
+- Provide local source code to the server and build remotely.
+- Provide built files to the server
+
+Start your website server.
+
+Configure your server, such as binding domain names, configuring ports, etc.
+
+## Fork This Project
+
+If you don't have a good plan or template, you can start by modifying this website. The source code of this website is available [here](https://github.com/startracex/startracex.github.io).
+
+Before that, you need to install a local JavaScript runtime, such as [`Node.js`](https://nodejs.org/en/download);
+and [`pnpm`](https://pnpm.io/installation) as a package manager, and clone or download the website source code to your local machine.
+
+You can also use an online development environment like [StackBlitz](https://stackblitz.com) without installing the above locally.
+
+Go to the root directory of the source code, run `pnpm i` to install dependencies. After installation, run `pnpm dev` to start the development server at [localhost:3000](http://localhost:3000), which should display the homepage of this website.
+
+You can delete or modify these contents to your own:
+
+- `https://github.com/startracex/startracex.github.io`, this is the repository link.
+- `shiro.wang` and `startracex.github.io`, these are the domains of this website.
+- `Shiro`, `Wang`, `Shiro Wang`, and `startracex`, these are the author names.
+- Contents under the `content/articles` directory, which includes all articles including this one.
+
+Run `pnpm build` to build for the production environment. To use a standalone build, replace it with `pnpm build:standalone`.
+
+After building, you can run `pnpm start` or `pnpm start:standalone` to start.
+
+If you need to use static site generation and output static files, use `pnpm build:export`.
+
+## Add Your Link
+
+If this article has helped you, you can add a link to your final webpage to this site. Please refer to [this article](./add-your-link.mdx)

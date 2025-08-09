@@ -1,0 +1,163 @@
+---
+title: package.json 中的常用字段
+description: package.json 中的常用字段解读
+---
+
+此文只简要记录 package.json 中的常用字段, 若要详细了解, 请参考 [npm 文档](https://docs.npmjs.com/cli/configuring-npm/package-json)
+
+## 元数据
+
+### name
+
+`name` 是一个包的标识, 应该在所发布的注册表中唯一.
+
+### version
+
+version 是一个包的语义化版本, 一些注册表中, 无法撤销或重新发布已经发布的版本, 例如 npmjs.
+
+### description
+
+description 是一个包的描述, 用于搜索包.
+
+### keywords
+
+keywords 是一个包的关键词, 用于搜索包.
+
+### repository
+
+repository 用于指定代码仓库, 一般是类似如下格式的 Git 地址
+
+```json
+{
+  "type": "git",
+  "url": "git+https://github.com/user/repo.git"
+}
+```
+
+如果它不类似此格式, 运行 `npm pkg fix` 可以重新格式化.
+
+如果缺失此字段或者 url 与实际仓库不匹配, provenance 发布将失败.
+
+### homepage, bugs
+
+homepage 和 bugs 用于指定包的主页和 bug 的反馈页面, 如果存在 repository, 它们也许可以自动推断.
+
+### license
+
+license 应使用 SPDX 许可证标识进行声明, [Npm 文档](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#license)里也有其他示例.
+
+## 发布
+
+### private
+
+将 private 设置为 true, 将阻止当前包发布, 常用于私有的内部包或工作区的根.
+
+### publishConfig
+
+publishConfig 用于更改发布配置, 例如更改访问级别 (access), 注册表(registry), 标签(tag)等.
+
+一些包管理器也允许变更发布的目录或更改更多字段.
+
+### files
+
+files 用于指定发布的文件, 如果存在, 将禁用 .npmignore 的忽略规则.
+
+## 入口
+
+### main, module, browser, types
+
+main, module, browser 是包的主入口, module, browser 会被一些构建工具优先使用, 你可以用它们标识不同条件的入口, 不过对于现代包更推荐使用 [exports](#exports)
+
+types 是包的 TypeScript 类型主入口.
+
+### bin
+
+bin 用于指定包的可执行文件, 该字段应该是一个对象, 如果不是对象, 运行 `npm pkg fix` 格式化到实际值.
+
+bin 中的键将作为命令名称以供包管理器执行, 或全局按照以直接执行.
+
+如果执行一个未安装的包暴露的命令, 或者执行一个包的创建器 则为与包名同名的命令, 如果不存在, 运行将失败.
+
+### exports
+
+exports 用于指定包的入口点, 并且优先于 main, JS 工具链和运行时一般会提供自定义条件的选项, 它们会根据选项的先后顺序进行匹配.
+
+常见互斥条件有 `production` 与 `development`, `import` / `module` 和 `require` 等.
+
+还有其他的常见条件: `types`, `default` 等.
+
+也有一些运行时专属条件: `deno`, `node` 等.
+
+exports 指定的入口和结果必须是 `.` 或以 `./` 开头, 并且使用 `*` 匹配多层目录和文件, 也不允许导入未在 exports 里出现的入口.
+
+[Node 文档](https://nodejs.org/api/packages.html#package-entry-points) 中有示例和详细解释.
+
+### imports
+
+imports 类似于 exports, 它只被包内部使用并且入口以 `#` 开头.
+
+## 开发
+
+### scripts
+
+scripts 用于声明命令别名, 并且可以直接运行包的可执行文件.
+
+一些特殊脚本会随着生命周期运行, 以 `pre` 和 `post` 开头的命令也会随着命令执行的前后期间执行. 例如 `prepare`, `prepublish`, `postinstall` 等.
+
+### packageManager
+
+packageManager 用于指定包管理器, 如果本地包管理器与项目不匹配, 大多数命令将直接失败, 一些工具链可能需要此字段来区分包管理器.
+
+### packages
+
+packages 用于指定单体仓库里的其他包路径, 一些包管理器不会遵循此字段, 例如 pnpm.
+
+## 依赖管理
+
+### dependencies
+
+dependencies 是包的直接依赖, 包管理器会在安装此包时一同安装 dependencies 里的包.
+
+### devDependencies
+
+devDependencies 作为开发依赖, 不会再安装此包时一同被安装.
+
+### peerDependencies
+
+peerDependencies 在包可能需要某个依赖, 但不作为直接依赖时有用, 一些包管理器会自动安装 peerDependencies 中的包.
+
+### optionalDependencies
+
+optionalDependencies 在安装失败, 或者不匹配平台和系统, 不会一同被安装.
+
+## 限制
+
+### os, cpu, libc
+
+os 与 cpu 将在不匹配当前系统和架构时被跳过, 强制安装将会忽略这些限制.
+
+os 为 "linux" 是也可以指定 libc.
+
+### engines
+
+engines 用于包所需的运行时或包管理器版本.
+
+### devEngines
+
+devEngines 与 engines 差别很大, 它支持 `cpu`, `os`, `libc`, `runtime` 和 `packageManager`, 在开发阶段进行限制
+
+## 人员字段
+
+### author
+
+author 是此包的作者, 其类型是一个 "人".
+
+一个 "人" 可以是字符串或具有 name 和可选的 url, email 字段
+
+### contributors
+
+contributors 是包含对此包做出贡献的人员的数组, 每个元素与 author 类型一致.
+
+### maintainers
+
+maintainers 是包含维护当前包的人员的数组, 每个元素与 author 类型一致.

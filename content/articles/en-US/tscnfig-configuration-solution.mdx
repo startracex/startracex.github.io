@@ -1,0 +1,136 @@
+---
+title: Personal TSConfig Configuration Solution
+description: Sharing my personal TSConfig configuration approach
+---
+
+My personal tsconfig has two main modes: one for library development and one for application development, both inheriting from the same base configuration.
+
+## Base Configuration
+
+```json title="base.json"
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    "customConditions": ["development", "import", "module"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "resolvePackageJsonImports": true,
+    "resolvePackageJsonExports": true,
+    "isolatedModules": true,
+    "allowJs": false,
+    "noImplicitThis": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
+```
+
+Setting `target` to `ESNext` transform code to the latest ECMAScript syntax, and including necessary libraries in `lib`.
+
+Setting `module` and `moduleResolution` to `NodeNext` enforces file extension usage and handles `imports` and `exports` fields.
+
+Enabling `resolvePackageJsonImports` and `resolvePackageJsonExports` ensures adherence to `imports` and `exports` regardless of the module resolution strategy.
+
+`customConditions` handles ES modules exported in `imports` and `exports`, prioritizing development conditions.
+
+`allowImportingTsExtensions` and `rewriteRelativeImportExtensions` permit importing `.ts` extensions and automatically convert them to `.js` during output.
+
+`forceConsistentCasingInFileNames` ensures filename casing matches import paths, crucial for case-insensitive systems like Windows.
+
+`allowSyntheticDefaultImports` and `esModuleInterop` facilitate proper ESM imports of CJS modules.
+
+`useDefineForClassFields` and `experimentalDecorators` support class fields and decorators while avoiding `object.defineProperty` for class fields or excessive code output for new decorators.
+Adjust these based on project needs to comply with ECMAScript class field standards or new decorator specifications.
+
+## Library Mode
+
+```json title="lib.json"
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "erasableSyntaxOnly": true,
+    "jsx": "react-jsx"
+  }
+}
+```
+
+The library configuration is designed for library development using tsc for building, with non-output settings matching the base configuration.
+
+`declaration`, `declarationMap`, and `sourceMap` should all be `true` to generate `.d.ts`, `.d.ts.map`, and `.js.map` files for type checking and debugging.
+
+Setting `erasableSyntaxOnly` to `true` prevents non-ECMAScript syntax usage, disabling enums, namespaces, constructor parameter access descriptors, and `import =`/`export =` assignments.
+
+For type imports like `import type`, you may need to enforce them by setting `verbatimModuleSyntax` to `true`, allowing the transformer to quickly distinguish between type and value imports.
+
+`jsx` is set to `react-jsx` to use React's new JSX transform, also known as "automatic" in other tools.
+
+## Application Mode
+
+```json title="app.json"
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "allowArbitraryExtensions": true,
+    "jsx": "preserve"
+  }
+}
+```
+
+Application mode is ideally paired with `"noEmit": true`, where TypeScript only performs type checking and actual output is handled by bundlers or build tools.
+
+Application mode uses `Bundler` as the module resolution strategy, which doesn't enforce import extensions.
+
+`allowArbitraryExtensions` permits importing files with any extension.
+
+`jsx` is set to `preserve` to avoid conflicts with build tools' JSX processing while preventing type errors.
+
+## Using the Configuration
+
+Apply this configuration in the following ways:
+
+- Write configurations in separate files as described and inherit them in your actual configuration:
+
+  ```json title="tsconfig.json"
+  {
+    "extends": "./base.json"
+  }
+  ```
+
+- Merge these configurations into a single configuration file.
+
+- Use configurations published on npm via inheritance:
+
+  ```package-install
+  npm i -D @startracex/dev-config
+  ```
+
+  The tsconfig configurations mentioned above are located at
+  `@startracex/dev-config/tsconfig/base`, `@startracex/dev-config/tsconfig/lib`, and `@startracex/dev-config/tsconfig/app`.
+
+  ```json title="tsconfig.json"
+  {
+    "extends": "@startracex/dev-config/tsconfig/lib"
+  }
+  ```
+
+## `tsc --init` Initial Template
+
+Starting from TypeScript 5.9, the initial configuration generated by `tsc --init` has been significantly simplified compared to previous versions.
+
+The generated base configuration can cover most scenarios.

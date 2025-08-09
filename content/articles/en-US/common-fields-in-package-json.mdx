@@ -1,0 +1,163 @@
+---
+title: Common fields in package.json
+description: Interpretation of common fields in package.json
+---
+
+This article briefly records the fields commonly used in package.json. For more information, please refer to the [npm documentation](https://docs.npmjs.com/cli/configuring-npm/package-json).
+
+## Metadata
+
+### name
+
+`name` is an identifier for a package and should be unique in the registry where it is published.
+
+### version
+
+version is the semantic version of a package. In some registries, you cannot unpublish or republish already released versions, such as npmjs.
+
+### description
+
+description is a description of the package, used for searching packages.
+
+### keywords
+
+keywords are search terms for the package, used for searching packages.
+
+### repository
+
+repository is used to specify the code repository, typically a Git URL in the following format:
+
+```json
+{
+  "type": "git",
+  "url": "git+https://github.com/user/repo.git"
+}
+```
+
+If it doesn't follow this format, running `npm pkg fix` can reformat it.
+
+If this field is missing or the URL doesn't match the actual repository, provenance publishing will fail.
+
+### homepage, bugs
+
+homepage and bugs are used to specify the package's homepage and bug feedback page. If a repository exists, they may be automatically inferred.
+
+### license
+
+license should be declared using an SPDX license identifier. The [Npm documentation](https://docs.npmjs.com/cli/v11/configuring-npm/package-json/#license) also provides other examples.
+
+## Publishing
+
+### private
+
+Setting private to true will prevent the package from being published, commonly used for private internal packages or workspace roots.
+
+### publishConfig
+
+publishConfig is used to change publishing configurations, such as access level, registry, tag, etc.
+
+Some package managers also allow changing the publish directory or modifying more fields.
+
+### files
+
+files is used to specify files to be published. If present, it will disable the ignore rules in .npmignore.
+
+## Entry Points
+
+### main, module, browser, types
+
+main, module, and browser are the main entry points of a package. module and browser are prioritized by some build tools. You can use them to identify entry points for different conditions, but [exports](#exports) is recommended for modern packages.
+
+types is the main entry point for TypeScript types of the package.
+
+### bin
+
+bin is used to specify executable files for the package. This field should be an object. If it's not an object, running `npm pkg fix` will format it to the actual value.
+
+The keys in bin will be used as command names for package managers to execute, or to run directly when installed globally.
+
+If you execute a command exposed by an uninstalled package, or execute a package's creator, it will be the command with the same name as the package. If it doesn't exist, the execution will fail.
+
+### exports
+
+exports is used to specify entry points for the package and takes precedence over main. JS toolchains and runtimes generally provide options for custom conditions, which are matched in the order of the options.
+
+Common mutually exclusive conditions include `production` vs `development`, `import`/`module` vs `require`, etc.
+
+There are other common conditions: `types`, `default`, etc.
+
+There are also some runtime-specific conditions: `deno`, `node`, etc.
+
+The entry points and results specified by exports must start with `.` or `./`, and use `*` to match multi-level directories and files. Importing entry points not listed in exports is not allowed.
+
+The [Node documentation](https://nodejs.org/api/packages.html#package-entry-points) contains examples and detailed explanations.
+
+### imports
+
+imports is similar to exports, but it's only used internally by the package and entry points start with `#`.
+
+## Development
+
+### scripts
+
+scripts is used to declare command aliases and can directly run the package's executable files.
+
+Some special scripts run with the lifecycle, and commands starting with `pre` and `post` also run before and after command execution. For example: `prepare`, `prepublish`, `postinstall`, etc.
+
+### packageManager
+
+packageManager is used to specify the package manager. If the local package manager doesn't match the project, most commands will fail directly. Some toolchains may require this field to distinguish package managers.
+
+### packages
+
+packages is used to specify other package paths in a monorepo. Some package managers do not follow this field, such as pnpm.
+
+## Dependency Management
+
+### dependencies
+
+dependencies are the direct dependencies of the package. Package managers will install the packages in dependencies along with this package.
+
+### devDependencies
+
+devDependencies are development dependencies and will not be installed when this package is installed.
+
+### peerDependencies
+
+peerDependencies are useful when a package may need a dependency but not as a direct dependency. Some package managers will automatically install packages in peerDependencies.
+
+### optionalDependencies
+
+optionalDependencies will not be installed if installation fails or if they don't match the platform and system.
+
+## Constraints
+
+### os, cpu, libc
+
+os and cpu will be skipped if they don't match the current system and architecture. Forced installation will ignore these constraints.
+
+When os is "linux", libc can also be specified.
+
+### engines
+
+engines is used for the runtime or package manager version required by the package.
+
+### devEngines
+
+devEngines is significantly different from engines. It supports `cpu`, `os`, `libc`, `runtime`, and `packageManager` for constraints during development.
+
+## People Fields
+
+### author
+
+author is the author of this package, and its type is a "person".
+
+A "person" can be a string or an object with a name and optional url and email fields.
+
+### contributors
+
+contributors is an array containing people who have contributed to this package. Each element has the same type as author.
+
+### maintainers
+
+maintainers is an array containing people who maintain the current package. Each element has the same type as author.

@@ -1,0 +1,66 @@
+---
+title: My Website is Reborn
+description: Three years ago, I built my first personal website, which was abandoned not long after. Now, I've redesigned this new website.
+---
+
+## Rebirth
+
+When I first started working on this website, I was actually trying to make a full-screen theme switcher - the idea popped into my head suddenly, and I wanted to implement it right away.
+
+My vision for this switcher was: it would include ternary theme modes - light, dark, and auto.
+
+In its initial state, the page would display a split view in "auto theme": the left half showing the light theme, and the right half showing the dark theme. When you click on a theme, that theme would expand to fill the entire screen; clicking again would return to the split view.
+
+But just having a theme switcher felt too simplistic, and you could barely notice the switching effect. So I put my personal introduction below, making it change along with the theme.
+
+With that, it looked like a proper personal website. I took the opportunity to officially turn it into one.
+
+## Technology Selection
+
+The new website uses `Next.js` (in fact, the old one did too), after all, it's the first front-end framework I came into contact with.
+
+When I built my first website back then, I was completely new to front-end development. At that time, Next.js was still version 12, which didn't support app routing yet, and all pages had to be placed in the pages directory.
+
+Before that, I had barely written any JavaScript, and knew nothing about TypeScript. I was basically a beginner who only knew HTML and CSS.
+
+Although I've also been exposed to React, I don't know much about JavaScript. I'm quite troubled by the JSX syntax. At that time, many tutorials were still focused on React class components. The first time I wrote a functional component was also in Next.js.
+
+Fortunately, many code examples in the Next.js documentation came with TypeScript versions, and it was through Next.js that I gradually embarked on my TypeScript learning journey.
+
+## Construction Process
+
+The project source code was created using create-next-app, with Tailwind CSS, TypeScript, and path aliases enabled during creation, these were configured when I first started working on the theme switcher.
+
+In terms of components, a small portion used Shadcn-ui and the Godown library I wrote before, but most were rewritten.
+
+For the documentation feature, I used Fumadocs. I discovered this library when planning to add documentation pages; it has a lot of useful encapsulations, saving me from having to handle Markdown files myself, which is very convenient.
+
+In terms of deployment, the website currently has two deployment sources: one on Vercel, and the other on GitHub Pages. However, GitHub Pages can't deploy back-end programs, so the one there uses static site generation (SSG) with export output.
+
+## Issues Encountered
+
+During the construction process, I encountered a rather hidden issue, specifically in the deployment phase of standalone output.
+
+I think few people would use standalone output - either use export output to deploy static pages, or use the default build to deploy to a regular host.
+
+With standalone build, you can start the web server via `node .next/standalone/server.js`, though I haven't researched the differences between it and the default build.
+
+I tried configuring this output method at the time, but soon ran into a problem: local packages like `react`, `react-dom`, `next`, and `typescript` all became empty directories!
+
+At first, I thought I had accidentally deleted the packages or that there was a problem with the package manager cache, so I had to delete the cache and redownload the packages.
+
+But after experiencing this three times in a row, I realized what was wrong: Next.js was clearing the local packages along with the .next directory - because there are some symbolic links in the .next directory that point exactly to these cleared packages.
+
+It was obvious that Next.js had a bug in handling the clearing of the output directory or file deletion.
+
+Fortunately, I quickly found the source of the problem, fixed it, created a pull request, and it has now been merged into the canary version
+
+As a technical novice, being able to contribute code to such a top framework, even if it's just a small change, made me excited a lot.
+
+Now, there's no need to worry about anyone else having their local packages cleared by Next.js when running a build, just like me.
+
+## Future Plans
+
+I'm a complete novice when it comes to website operation, and I'm not even sure if this website will be abandoned by me after a while like the previous one. But I'll try to update more content and gradually fill it up.
+
+If you have any questions about the content mentioned on the website, you can find my contact information through the contact module in the header - feel free to ask me anything.

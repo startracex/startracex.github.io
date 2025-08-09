@@ -1,0 +1,318 @@
+---
+title: "教程: 发布一个 npm 包"
+description: 一步步教你从 GitHub Action 发布一个 npm 包
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+
+此教程将会发布一个具有基本内容的 npm 包, 从 GitHub Action 发布到 npmjs 注册表.
+
+为保持教程的简单, 我们不会涉及其他工具, 如代码检查, 格式化, 测试, 打包等环节. 但会添加类型声明和发布出处, 以及其他必要内容.
+
+此文章中的连接使用 `<user>` 和 `<repo>` 作为占位符, 在导航时请注意进行替换.
+
+## 准备工作
+
+你需要具有一个 npm 账户, 和一个 GitHub 账户, 它们用于发布包. Git 用于管理代码. 任意 JS 包管理器用于管理依赖.
+
+在 GitHub [创建一个仓库](https://github.com/new), 你可以在此处选择一个适合你的许可证.
+
+上述操作完成后, 将仓库克隆到本地, 或者将本地仓库与远程连接.
+
+## 初始化项目配置
+
+创建一个 package.json, 它是包的元数据, 由于包名必须唯一, 你需要在创建前检查是否存在或与其他包名过于相似, 否则会导致发布失败.
+
+为避免与其他包名冲突, 你可以在包名中添加范围 (scope).
+
+你具有自己用户名的范围的权限, 你也可以创建一个组织, 并在组织范围下发布包.
+
+我们的 package.json 目前如下, 你需要替换某些内容为你的实际值:
+
+```json title="package.json"
+{
+  "name": "@scope/pkg",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {},
+  "author": "you",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/<user>/<repo>.git"
+  }
+}
+```
+
+由于我们要发布具有类型声明的包, 我们需要安装 TypeScript.
+
+```package-install
+npm i -D typescript
+```
+
+创建一个基础的 tsconfig.json, 它是 TypeScript 的配置文件, 我们将使用如下的配置.
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*.ts"]
+}
+```
+
+## 编写核心功能代码
+
+我们将实现一个简易的日期格式化工具
+
+```ts title="src/utils.ts"
+function padNumberArray(n: number, padLen = 2): string[] {
+  return n.toString().padStart(padLen, "0").split("");
+}
+
+export function createKeyCharMap(date: Date): Record<string, string[]> {
+  const z = date.getTimezoneOffset() / -60;
+  return {
+    Z: [z === 0 ? "0" : z > 0 ? `+${z}` : `-${z}`],
+    Y: padNumberArray(date.getFullYear()),
+    M: padNumberArray(date.getMonth() + 1),
+    D: padNumberArray(date.getDate()),
+    h: padNumberArray(date.getHours()),
+    m: padNumberArray(date.getMinutes()),
+    s: padNumberArray(date.getSeconds()),
+    S: padNumberArray(date.getMilliseconds(), 3),
+  };
+}
+
+export function format(fmt: string, km: Record<string, string[]>, escape: string): string {
+  const escapeReplacement = escape + escape;
+  const rest: string[] = [];
+  const fmtLen = fmt.length;
+  const fmtChars = Array.from(fmt);
+  for (let i = 0; i < fmtLen; i++) {
+    if (fmtChars[i] === escape) {
+      const nextChar = fmtChars[i + 1];
+      if (nextChar && (nextChar === escape || nextChar in km)) {
+        rest.push(nextChar);
+        fmtChars[i] = escapeReplacement[0];
+        fmtChars[i + 1] = escapeReplacement[1];
+        i++;
+      }
+    }
+  }
+  const finalChars: string[] = new Array(fmtLen);
+  for (let i = fmtLen - 1; i >= 0; i--) {
+    const fmtChar = fmtChars[i];
+    finalChars[i] = km[fmtChar]?.pop() ?? fmtChar;
+  }
+  let restIndex = 0;
+  const output: string[] = new Array(fmtLen);
+  for (let i = 0; i < fmtLen; i++) {
+    if (finalChars[i] === escape && finalChars[i + 1] === escape) {
+      output[i] = rest[restIndex];
+      restIndex++;
+      i++;
+    } else {
+      output[i] = finalChars[i];
+    }
+  }
+  return output.join("");
+}
+```
+
+```ts title="src/index.ts"
+import { format, createKeyCharMap } from "./utils.js";
+
+export function fmtime(fmt: string, date: Date = new Date(), escape: string = "%"): string | undefined {
+  if (!fmt) {
+    return fmt;
+  }
+  if (isNaN(date.getTime())) {
+    return undefined;
+  }
+  return format(fmt, createKeyCharMap(date), escape);
+}
+```
+
+## 配置构建与产物输出
+
+源代码完成了, 现在添加构建脚本将其转换为 JavaScript. 运行 `build` 脚本将构建包.
+
+```json title="package.json"
+{
+  "scripts": {
+    "build": "tsc"
+  }
+}
+```
+
+大多数 JS 包将产物放入独立的目录, 要这样做, 可以将 outDir 添加到 tsconfig.json.
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  }
+}
+```
+
+JavaScript, 和 Source Map 将输出在 dist 目录, 这是常见的产物目录, 并且此目录应该被 .gitignore 忽略.
+
+```plain title=".gitignore"
+node_modules
+dist
+```
+
+## 声明模块入口
+
+我们还需要对 package.json 声明入口
+
+```json title="package.json"
+{
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils.js": "./dist/utils.js"
+  }
+}
+```
+
+这样, 当用户就可以通过 `import "@scope/pkg"` 和 `import "@scope/pkg/utils.js"` 来引入我们导出的模块.
+
+## 编写说明文档
+
+还需要创建一个 readme 文件, 它将作为包的说明文档, 并显示在包的主页, 例如:
+
+````md title="readme.md"
+# @scope/pkg
+
+```sh
+npm i @scope/pkg
+```
+
+```js
+import { fmtime } from "@scope/pkg";
+
+fmtime("YYYY-DD-MM hh:mm:ss");
+```
+````
+
+## 指定发布文件范围
+
+确定需要发布的文件, 我们使用 files 字段限制发布的文件, 你也可以使用 .npmignore 文件,
+如果二者都不存在, 将会使用 .gitignore 的规则.
+你无需指定 package.json, readme.md, license, 它们将自动被包含在发布的包中.
+
+```json title="package.json"
+{
+  "files": ["src", "dist"]
+}
+```
+
+## 发布
+
+创建一个 npm 令牌用于发布到注册表
+
+- 前往 `https://www.npmjs.com/settings/<user>/tokens/new` 创建经典令牌
+- 或 `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new` 创建精细控制令牌
+
+前往 `https://github.com/<user>/<repo>/settings/secrets/actions/new` 为仓库添加密钥, 名称可以是 NPM_TOKEN 或类似的变量名, 之后的步骤与此保持一致, 值是在上一步创建的令牌
+
+前往 `https://github.com/<user>/<repo>/settings/actions`, 授予工作流的读写权限 (Read and write permissions).
+
+添加一个 [GitHub Action](https://docs.github.com/zh/actions) 工作流, 此工作流将在发布 Release 时自动发布包.
+
+```yml title=".github/workflows/publish.yml"
+name: Publish to npmjs
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          registry-url: https://registry.npmjs.org
+          cache: npm
+      - run: npm install
+      - run: npm run build
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+```
+
+`actions/setup-node` 仅包含 npm 和 yarn@1, 如果你使用其他包管理器, 请参阅它们各自的工作流文档, 或者手动安装它们.
+
+`actions/setup-node` [在设置 registry-url 时, 默认将 `env.NODE_AUTH_TOKEN` 作为登录令牌](https://github.com/actions/setup-node/?tab=readme-ov-file#usage),
+你可以在此工作流中运行 `npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}` 更改此行为.
+
+### access
+
+access 可以是 `restricted` (默认) 或者 `public`, 可以通过这些方式设置
+
+- 在执行发布命令时传递 `--access public` 参数
+- 修改 package.json:
+  ```json title="package.json"
+  {
+    "publishConfig": {
+      "access": "public"
+    }
+  }
+  ```
+
+### provenance
+
+provenance 用于向 npm 证明包的发布来源与仓库一致, 可以通过这些方式启用
+
+- 在执行发布命令时传递 `--provenance` 参数
+- 设置环境变量 `NPM_CONFIG_PROVENANCE: true`
+- 设置 npm 配置: `npm config set provenance true`
+- 修改 package.json:
+  ```json title="package.json"
+  {
+    "publishConfig": {
+      "provenance": true
+    }
+  }
+  ```
+
+## 最终目录结构与发布流程
+
+我们的目录结构应该如下.
+
+<Files>
+  <Folder name=".github">
+    <Folder name="workflows">
+      <File name="publish.yml" />
+    </Folder>
+  </Folder>
+  <Folder
+    name="src"
+    defaultOpen
+  >
+    <File name="index.ts" />
+    <File name="utils.ts" />
+  </Folder>
+  <File name=".gitignore" />
+  <File name="package.json" />
+  <File name="tsconfig.json" />
+</Files>
+
+现在, 前往 `https://github.com/<user>/<repo>/releases/new` 发布 Release, Action 应当能够正确发布包.
+
+发布完成后, 你可以在 npmjs 上查看发布的包.

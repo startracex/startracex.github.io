@@ -1,0 +1,33 @@
+---
+title: 添加你的链接
+description: 将你的链接添加到本站
+---
+
+我的网站新增了友情链接的页面, 你也可以添加自己的网站链接.
+
+你需要 fork 此仓库, 然后将你的链接添加到 `src/app/[lang]/(content)/links/_data.ts`, 再提交 PR 即可.
+在添加链接时, 将新增的链接放在 Example 之前, 这样所有新增链接将会按添加顺序排序, 并将 Example 放在最后.
+
+一个链接的格式如下
+
+```js
+{
+  name: {
+    "en-US": "Example",
+    "zh-CN": "示例",
+  },
+  description: {
+    "en-US": "Example website",
+    "zh-CN": "示例网站",
+  },
+  url: "https://example.com",
+  preview: "/placeholder.svg",
+  languages: ["English"],
+}
+```
+
+`preview` 是链接的预览图, 你可以截图存在 `public` 目录下, 也可以使用自己的图床. 显示比例为8:5.
+
+如果你不想使用此方式, 也可以直接联系我, 告诉我上述信息, 我将会帮你添加.
+
+添加完成之后, 下次部署时, 链接会在 [/zh-CN/links](/zh-CN/links) 页面显示.

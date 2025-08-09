@@ -1,0 +1,152 @@
+---
+title: Evolution of JavaScript Modularity
+description: The development process of JavaScript modularization
+---
+
+In its early days, JavaScript was designed as a scripting language for page interactions without considering modularity.
+
+As a result, early developers had to work in the global scope and manually maintain the order of script imports.
+
+## Namespaces
+
+In the early stages, JavaScript files commonly placed content to be "exported" into a uniquely named global variable.
+This was the simplest form of modularity.
+
+```js title="my-module.js"
+var myModule = {
+  count: 100,
+  increase: () => myModule.count++,
+};
+```
+
+```html
+<script src="my-module.js"></script>
+<script>
+  myModule.increase();
+</script>
+```
+
+## Immediately Invoked Function Expression (IIFE)
+
+Because modules had to be declared globally, code often declared variables in the top-level scope.
+
+However, top-level `var` declarations would be hoisted to the global scope.
+
+Unlike today, where `let` declarations and strict mode can prevent this, to avoid accidental hoisting of these variables,
+they could be wrapped in immediately invoked function expressions.
+
+An IIFE looks like this:
+
+```js title="my-module.js"
+var myModule = (function (exports) {
+  "use strict";
+
+  exports.count = 100;
+  const increase = () => exports.count++;
+
+  exports.increase = increase;
+
+  return exports;
+})({});
+```
+
+## CommonJS Modules
+
+In 2009, the CommonJS group proposed the CommonJS module specification, primarily for server-side use.
+
+Node.js adopted this module specification.
+
+A CommonJS module looks like this:
+
+```js title="my-module.js"
+"use strict";
+
+exports.count = 100;
+const increase = () => exports.count++;
+
+exports.increase = increase;
+```
+
+## AMD Modules
+
+After CommonJS emerged, because modules used synchronous loading,
+there were no performance issues on the server, but in browser environments, this could cause rendering blocking.
+
+To solve this problem, RequireJS led the development of AMD modules,
+primarily for automatic dependency management and asynchronous module loading.
+
+An AMD module looks like this:
+
+```js title="my-module.js"
+define(["exports"], function (exports) {
+  "use strict";
+
+  exports.count = 100;
+  const increase = () => exports.count++;
+
+  exports.increase = increase;
+});
+```
+
+## UMD Modules
+
+Since the same code often needs to run in different environments (browsers and Node),
+it's common to check the current environment to execute different code.
+
+UMD was designed to allow a single codebase to run in different environments,
+using different module loaders: AMD or global namespaces in browsers, and CommonJS on servers.
+
+A UMD module looks like this:
+
+```js title="my-module.js"
+(function (global, factory) {
+  typeof exports === "object" && typeof module !== "undefined"
+    ? factory(exports)
+    : typeof define === "function" && define.amd
+      ? define(["exports"], factory)
+      : ((global = typeof globalThis !== "undefined" ? globalThis : global || self), factory((global.myModule = {})));
+})(this, function (exports) {
+  "use strict";
+
+  exports.count = 100;
+  const increase = () => exports.count++;
+
+  exports.increase = increase;
+});
+```
+
+## ECMAScript Modules
+
+It wasn't until 2015 that ECMAScript 6 introduced a module system, marking JavaScript's first official module system.
+
+It uses `import` and `export` keywords to declare imports and exports.
+Unlike other module specifications that allow dynamic modification of exported content,
+ECMAScript modules have static exports, enabling tree-shaking optimization.
+
+An ECMAScript module looks like this:
+
+```js title="my-module.js"
+export const count = 100;
+export const increase = () => count++;
+```
+
+## SystemJS Modules
+
+SystemJS was primarily used to convert ESM, CJS, and other modules into code that could run directly in browsers.
+
+During the period when browsers didn't support ESM, SystemJS filled this gap.
+After browsers added ESM support, SystemJS usage declined significantly.
+
+A SystemJS module looks like this:
+
+```js title="my-module.js"
+System.register("myModule", [], function (exports) {
+  "use strict";
+  return {
+    execute: function () {
+      let count = exports("count", 100);
+      const increase = exports("increase", () => (exports("count", count + 1), count++));
+    },
+  };
+});
+```

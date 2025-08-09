@@ -1,0 +1,106 @@
+---
+title: "教程: monorepo 实践"
+description: monorepo 实践指南
+---
+
+import { File, Folder, Files } from "fumadocs-ui/components/files";
+
+## 概要
+
+Monorepo 是一种代码仓库管理方式, 它将多个项目整合到同一个仓库中.
+不同与单仓库 (monolithic) 将所有代码无拆分地存于一个仓库, 或者多仓库 (multirepo) 每个项目放在单独仓库中.
+monorepo 能简化跨项目协作, 减少依赖冗余, 统一开发规范, 是多项目管理的高效方案.
+
+## 配置工作区
+
+工作区的包可以存放在多个位置, 仅需确保工作区的 Glob 匹配模式能够包含所有的包.
+
+在工作区根目录下, 更新 `pnpm-workspace.yaml` 或 `package.json`, 添加子包的匹配规则.
+
+例如, 若将所有子包集中放在 `packages` 目录下, `packages/*` 即可匹配该目录下的所有包:
+
+```yml title="pnpm-workspace.yaml" tab="pnpm"
+packages:
+  - "packages/*"
+```
+
+```json title="package.json" tab="others"
+{
+  "workspaces": ["packages/*"]
+}
+```
+
+我们的目录结构类似这样:
+
+<Files>
+  <Folder
+    name="packages"
+    defaultOpen
+  >
+    <Folder name="pkg-a">
+      <File name="package.json" />
+    </Folder>
+    <Folder name="pkg-b">
+      <File name="package.json" />
+    </Folder>
+    <Folder name="pkg-c">
+      <File name="package.json" />
+    </Folder>
+  </Folder>
+  <File name="package.json" />
+</Files>
+
+工作区根目录不应被发布到注册表, 因此请将工作区根目录和私有包目录下的 package.json 的 private 字段设置为 true, 以避免误发布.
+
+```json title="package.json"
+{
+  "private": true
+}
+```
+
+## 管理依赖
+
+原有的包移动到工作区, 或者子包位置创建新的包.
+
+如果这些包具有依赖关系, 则将这些依赖版本更改为工作区协议.
+
+```json title="packages/pkg-a/package.json" tab="pnpm"
+{
+  "dependencies": {
+    "@scope/pkg-b": "workspace:^",
+    "@scope/pkg-c": "workspace:*"
+  }
+}
+```
+
+```json title="packages/pkg-a/package.json" tab="others"
+{
+  "dependencies": {
+    "@scope/pkg-b": "^",
+    "@scope/pkg-c": "*"
+  }
+}
+```
+
+建议将多个包共用的开发依赖提升到工作区根目录, 以减少重复安装和避免版本不一致等问题, 而生产依赖则需保留在各自子包的依赖配置中。
+
+一些配置文件如 tsconfig, eslint 等, 这些公共配置通常会独立为单独的包, 方便其他包引用或发布到注册表.
+
+## 增量构建与任务调度
+
+随着 monorepo 中子包数量增加, 构建, 测试等流程的耗时会显著增长, 我们无需重复处理未发生变更的包. 因此常借助增量构建系统解决这一问题.
+
+像 [turbo](https://turborepo.com/), [nx](https://nx.dev), [lerna](https://lerna.js.org) 这样的增量构建系统. 会分析包的依赖关系, 自动跳过已缓存的内容，仅处理修改过的部分
+
+对于格式化, 代码检查等仅涉及源代码的任务, 增量执行的方式更灵活, 常见策略有:
+
+- 由上述增量构建系统负责管理.
+- 在工作区的根对检查通过的文件进行缓存, 而不是对子包的缓存, 例如 [dprint](https://dprint.dev) 和 [biome](https://biomejs.dev).
+- 只对暂存区的文件进行检查, 例如 [lint-staged](https://github.com/okonet/lint-staged).
+
+## 版本管理与发布
+
+一些包管理器如 npm, 不会自动提升工作区根的 license. 因此你可能需要在发布前拷贝 license, 或者在每个子包独立维护.
+
+要在工作区递归运行发布命令, 发布所有的包, 你或许可以尝试 [changesets](https://github.com/changesets/changesets), [lerna](https://lerna.js.org) 这样的工具.
+用于自动管理版本, 生成变更日志, 发布到注册表等.

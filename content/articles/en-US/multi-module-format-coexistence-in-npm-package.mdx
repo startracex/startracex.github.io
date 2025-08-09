@@ -1,0 +1,64 @@
+---
+title: Multi-module Format Coexistence in npm Packages
+description: Explaining the necessity, differences, and solutions for coexistence of multiple module formats (ESM and CJS) in npm packages
+---
+
+## The Necessity of Multi-module Format Coexistence
+
+Before the emergence of the ESM specification, CJS was the mainstream module system, giving birth to a large number of underlying packages. Even now, many packages only provide CJS versions. Fortunately, almost all runtimes and build tools can convert CJS to ESM, allowing ESM modules to properly import CJS modules.
+
+After ESM gained popularity, many packages began to provide ESM versions. But backward compatibility presents obstacles. Most tools do not support converting ESM to CJS.
+
+Even though ESM has become mainstream, many developers still rely on the CJS ecosystem. For packages that only provide ESM format, downstream developers will be unable to write CJS.
+
+Packages that support both ESM and CJS formats have become the optimal solution for balancing compatibility and technological evolution.
+
+## Module Differences
+
+Some content differs between ESM and CJS. Most converters do not handle these behaviors and usually require additional plugins for safe conversion.
+
+`__filename` is a variable directly used in CJS for the current file path. In ESM, use `import.meta.filename` or `fileURLToPath(import.meta.url)` instead.
+
+`__dirname` is a variable in CJS for the current directory path. Use `import.meta.dirname` or `dirname(fileURLToPath(import.meta.url))` instead.
+
+`require` will not be available in future ESM modules. Even if CJS modules are supported, they cannot be accessed in ESM modules. Use `createRequire(import.meta.url)` instead.
+
+As for `global`, it's not a module difference but a runtime difference.
+
+## Implementation of Multi-module Format Coexistence
+
+For modern projects, the best practice is: write source code using ESM, then use build tools to convert to CJS. Configure the same entry for both formats and determine whether to use ESM or CJS based on custom conditions.
+
+This requires support from the exports field in package.json. Currently, most build tools and NPM-supporting CDN services support exports resolution, so you can use it with confidence.
+
+Typically, output the format matching the module to the `.js` extension, and the other format to a specific `.mjs` or `.cjs` extension. Alternatively, output both formats to `.mjs` or `.cjs` extensions.
+
+There may also be other entries that do not require conditional judgment, such as static files, package.json, and formats like UMD and AMD. These entries point directly to their corresponding files.
+
+In TypeScript projects, the type declaration files generated for ESM and CJS module formats are usually consistent, so you only need to provide type declarations for one of the formats.
+
+For the above situations, we can use the following package.json configuration:
+
+```json
+{
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./index.js",
+      "types": "./index.d.ts",
+      "require": "./index.cjs"
+    },
+    "./some-file.js": {
+      "import": "./some-file.js",
+      "types": "./some-file.d.ts",
+      "require": "./some-file.cjs"
+    },
+    "./other-format.js": "./other-format.js",
+    "./package.json": "./package.json"
+  }
+}
+```
+
+You can supplement with main (pointing to CJS) and module (pointing to ESM), but their priority is lower than exports. They only take effect for tools that do not support exports or when exports is missing.
+
+Additionally, the types field in the above configuration can be safely removed because the main filename of the type file is consistent with the corresponding module file.

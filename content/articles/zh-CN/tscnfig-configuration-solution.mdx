@@ -1,0 +1,136 @@
+---
+title: 个人 TSConfig 配置方案
+description: 分享我自己的 TSConfig 配置方案
+---
+
+我自己的 tsconfig, 主要有两个模式, 一种面向库开发, 一种面向应用开发, 两者均继承自同一套公共配置.
+
+## 公共配置
+
+```json title="base.json"
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleDetection": "force",
+    "moduleResolution": "NodeNext",
+    "customConditions": ["development", "import", "module"],
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "skipDefaultLibCheck": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "resolvePackageJsonImports": true,
+    "resolvePackageJsonExports": true,
+    "isolatedModules": true,
+    "allowJs": false,
+    "noImplicitThis": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
+    "forceConsistentCasingInFileNames": true
+  }
+}
+```
+
+`target` 设置为 `ESNext`, 这会将代码转换为最新的 ECMAScript 语法, 在 `lib` 里包含所必须的库.
+
+`module` 和 `moduleResolution` 设置为 `NodeNext`, tsc 将强制要求使用拓展名, 并处理 `imports` 和 `exports` 字段.
+
+`resolvePackageJsonImports`, `resolvePackageJsonExports` 设置为 `true`, 确保无论何种模块解析策略, 都遵循 `imports` 和 `exports`.
+
+`customConditions` 处理 `imports` 和 `exports` 中导出的 ES 模块, 并优先使用开发条件.
+
+`allowImportingTsExtensions` 和 `rewriteRelativeImportExtensions` 允许导入 `.ts` 拓展名, 并在输出时自动修改为 `.js`.
+
+`forceConsistentCasingInFileNames` 确保文件名的大小写与导入路径一致, 这在 Windows 等大小写不敏感的系统中尤为重要.
+
+`allowSyntheticDefaultImports` 和 `esModuleInterop` 用于正确在 ESM 中导入 CJS 模块.
+
+`useDefineForClassFields` 和 `experimentalDecorators` 用于支持类字段和装饰器.
+避免使用 `object.defineProperty` 定义类字段, 或者为新版装饰器输出大量代码, 若要遵循 ECMAScript 的类字段或兼容新版装饰器规范，可根据项目需求调整.
+
+## 库模式
+
+```json title="lib.json"
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "erasableSyntaxOnly": true,
+    "jsx": "react-jsx"
+  }
+}
+```
+
+库配置主要用于库开发, 适用于使用 tsc 进行构建, 非输出配置与公共配置相同.
+
+`declaration`, `declarationMap`, `sourceMap` 这三个选项都需要设置为 `true`, 以便生成 `.d.ts`, `.d.ts.map`, `.js.map`, 用于类型检查和调试.
+
+为了防止使用非 ECMAScript 语法, 将 `erasableSyntaxOnly` 设置为 `true`, 这会禁用枚举, 命名空间, 构造器参数的访问描述符, `import =` 和 `export =` 赋值.
+
+`import type` 这种类型导入可能也需要被强制添加, 以便转换器能够快速区分类型导入和值导入, 对于这种情况, 可设置 `verbatimModuleSyntax` 为 `true`.
+
+`jsx` 设置为 `react-jsx`, 这会使用 react 的新版 jsx, 其他工具可能称它为 "automatic".
+
+## 应用模式
+
+```json title="app.json"
+{
+  "extends": "./base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "allowJs": true,
+    "allowArbitraryExtensions": true,
+    "jsx": "preserve"
+  }
+}
+```
+
+应用模式理想应该是与 `"noEmit": true` 搭配, TypeScript 仅进行类型检查, 实际的输出由打包器或构建工具处理.
+
+应用模式将使用 `Bundler` 作为模块解析策略, 它不强制要求导入添加拓展名.
+
+`allowArbitraryExtensions` 允许导入任意拓展名的文件.
+
+jsx 设置为 `preserve` 避免与构建工具的 JSX 处理流程冲突, 同时避免类型错误.
+
+## 配置的使用方式
+
+可通过以下方式应用这套配置:
+
+- 像前文描述的那样将它们写入多个文件, 并在实际配置中继承它们.
+
+  ```json title="tsconfig.json"
+  {
+    "extends": "./base.json"
+  }
+  ```
+
+- 将这些配置合并到单一配置文件.
+
+- 使用继承发布在 npm 的配置.
+
+  ```package-install
+  npm i -D @startracex/dev-config
+  ```
+
+  上述的 tsconfig 配置位于
+  `@startracex/dev-config/tsconfig/base`, `@startracex/dev-config/tsconfig/lib` 和 `@startracex/dev-config/tsconfig/app`.
+
+  ```json title="tsconfig.json"
+  {
+    "extends": "@startracex/dev-config/tsconfig/lib"
+  }
+  ```
+
+## `tsc --init` 的初始模板
+
+自 TypeScript 5.9 开始, 简化了 `tsc --init` 的初始配置, 相较之前的版本已经大幅简化.
+
+其生成的基础配置也可以涵盖多数场景.
