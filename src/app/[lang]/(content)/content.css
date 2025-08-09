@@ -63,3 +63,11 @@
 #nd-tocnav {
   top: 0 !important;
 }
+
+godown-heading code {
+  font-size: 0.8em;
+}
+
+.prose code {
+  vertical-align: bottom;
+}

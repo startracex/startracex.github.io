@@ -9,9 +9,15 @@ type Links = {
 
 export const links: Links = [
   {
-    name: "Example",
+    name: {
+      "en-US": "Example",
+      "zh-CN": "示例",
+    },
+    description: {
+      "en-US": "Example website",
+      "zh-CN": "示例网站",
+    },
     url: "https://example.com",
-    description: "Example website",
     preview: "/placeholder.svg",
     languages: ["English"],
   },
