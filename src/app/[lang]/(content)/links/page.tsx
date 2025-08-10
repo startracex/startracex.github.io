@@ -39,7 +39,12 @@ export default async function Page({
               />
               <div className="p-4 space-y-2">
                 <h3 className="text-xl">{name}</h3>
-                <p className=" text-muted-foreground">{description}</p>
+                <p className="text-muted-foreground">{description}</p>
+                <p className="text-sm text-muted-foreground space-x-2">
+                  {link.languages.map((l) => (
+                    <span key={l}>{l}</span>
+                  ))}
+                </p>
               </div>
             </a>
           );
