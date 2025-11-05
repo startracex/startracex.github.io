@@ -1,0 +1,33 @@
+---
+title: NPM token 变更
+---
+
+我有很久没更新我的 NPM 包了, 前些天我将新的包发布到 NPM 上时,
+Workflow 在运行发布命令时出现了错误,
+我还以为自己填错了令牌 (事实上确实如此, 我错误复制了不完整的令牌内容),
+于是修正了令牌重新发布, 结果还是出现错误, 竟然不是我的错误, 有点难以相信.
+
+查看错误日志才发现, 近期 NPM 发布了令牌认证的重大更新, 根据
+[Strengthening npm security: Important changes to authentication and token management](https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/)
+的描述, 精细令牌和经典令牌均有调整.
+
+新的精细令牌的最长有效期不再是无限制, 最长为 90 天, 这意味着每隔最多 90 天你就必须前往 NPM 官网更新令牌.
+
+之前生成的精细令牌没被限制, 不过或许在一段时间后也会受限.
+
+经典令牌则被完全移除.
+
+虽然 NPM 官网一直有公示, 不过我一直没有留意, 我没想到 NPM 会做出如此大的变更, 这不像是 NPM 的风格.
+
+针对新的发布流程, NPM 推荐我们使用 [可信发布](https://docs.npmjs.com/trusted-publishers),
+此方式则不再需要申请和维护精细令牌, 配置方式也非常简单:
+
+- 前往包在 npm 网站的设置页面, 输入 Git 服务商的用户名和仓库名, 以及运行发布的工作流文件名称.
+
+- 在工作流中运行 `npm publish`, 就可以完成发布.
+
+如果你以前使用工作流进行发布, 则在完成设置之后, 可以删除工作流中所有用于发布到 npmjs.org 时的身份认证,
+可信发布会自动认证并生成出处声明.
+
+虽然这对于已存在的包很方便, 但是为新包设置会非常麻烦: 必须先发布包, 然后前往此包在 NPM 的设置页面进行设置, 然后才能使用
+如果一个仓库有多个包, 那么需要为每个包都进行此操作.
