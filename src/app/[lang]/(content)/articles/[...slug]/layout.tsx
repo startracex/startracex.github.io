@@ -1,6 +1,5 @@
 import { DocsLayout } from "fumadocs-ui/layouts/docs";
 import type { ReactNode } from "react";
-import type { PageTree } from "fumadocs-core/server";
 import { articleSource } from "@/lib/source";
 
 export default async function Layout({
@@ -14,7 +13,7 @@ export default async function Layout({
 }) {
   const { lang } = await params;
 
-  const tree = articleSource.pageTree[lang] as unknown as PageTree.Root;
+  const tree = articleSource.pageTree[lang];
   return (
     <DocsLayout
       themeSwitch={{
@@ -24,6 +23,9 @@ export default async function Layout({
         enabled: false,
       }}
       sidebar={{
+        enabled: false,
+      }}
+      nav={{
         enabled: false,
       }}
       tree={tree}
