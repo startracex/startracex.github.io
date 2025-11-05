@@ -1,4 +1,6 @@
 @import "../../globals.css";
+@import "tailwindcss";
+@import "fumadocs-ui/css/black.css";
 @import "fumadocs-ui/css/preset.css";
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -70,4 +72,10 @@ godown-heading code {
 
 .prose code {
   vertical-align: bottom;
+}
+
+#nd-toc {
+  position: relative !important;
+  top: 0 !important;
+  inset-inline-end: 0 !important;
 }

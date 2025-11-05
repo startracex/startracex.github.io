@@ -66,6 +66,7 @@ export default async function Page(props: {
             <h1 className="text-3xl font-bold">{page.data.title}</h1>
             <p className="text-muted-foreground">{page.data.description}</p>
             <DocsBody>
+              `
               <MDXContent
                 components={getMDXComponents({
                   a: createRelativeLink(articleSource, page),
@@ -73,7 +74,7 @@ export default async function Page(props: {
               />
             </DocsBody>
             <div className="flex justify-between text-sm">
-              <Link
+              {/* <Link
                 className="hover:underline"
                 href={`https://github.com/startracex/startracex.github.io/blob/main/content/${page.data._file.path.replaceAll(
                   "\\",
@@ -81,7 +82,7 @@ export default async function Page(props: {
                 )}`}
               >
                 {t`Edit on GitHub`}
-              </Link>
+              </Link> */}
               {updatedAt && (
                 <time>
                   {t`Last updated`} {fmtime("YYYY-MM-DD", new Date(updatedAt))}
@@ -90,7 +91,7 @@ export default async function Page(props: {
             </div>
             <PageFooter className="p-0" />
           </div>
-          <PageTOC className="top-0!">
+          <PageTOC>
             <PageTOCTitle />
             <PageTOCItems variant="clerk" />
           </PageTOC>

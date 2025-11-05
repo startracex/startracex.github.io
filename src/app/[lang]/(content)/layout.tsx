@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { RootProvider } from "fumadocs-ui/provider";
+import { RootProvider } from "fumadocs-ui/provider/next";
 import { Header } from "fumadocs-ui/layouts/home";
 import SearchDialog from "@/components/search";
 import { i18nConfig } from "@/lib/i18n";
