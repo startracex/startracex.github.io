@@ -220,10 +220,19 @@ fmtime("YYYY-DD-MM hh:mm:ss");
 
 ## 发布
 
+### 本地发布
+
+你可以通过 npm cli 将包发布到注册表.
+
+运行 `npm login` 或 `npm adduser` 登录.
+
+通过 `npm publish` 命令发布包.
+
+### CI/CD 发布
+
 创建一个 npm 令牌用于发布到注册表
 
-- 前往 `https://www.npmjs.com/settings/<user>/tokens/new` 创建经典令牌
-- 或 `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new` 创建精细控制令牌
+前往 `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new` 创建精细控制令牌.
 
 前往 `https://github.com/<user>/<repo>/settings/secrets/actions/new` 为仓库添加密钥, 名称可以是 NPM_TOKEN 或类似的变量名, 之后的步骤与此保持一致, 值是在上一步创建的令牌
 
@@ -243,8 +252,8 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org
@@ -260,6 +269,24 @@ jobs:
 
 `actions/setup-node` [在设置 registry-url 时, 默认将 `env.NODE_AUTH_TOKEN` 作为登录令牌](https://github.com/actions/setup-node/?tab=readme-ov-file#usage),
 你可以在此工作流中运行 `npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}` 更改此行为.
+
+### 可信发布
+
+如果使用可信发布, 需要首先发布包, 然后前往包在 NPM 的设置页面, 输入 Git 服务商的用户名和仓库名, 以及运行发布的工作流名称, 即可配置可信发布.
+
+使用可信发布时, 无需身份验证, 你可以安全移除发布到 npmjs 的身份验证内容:
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # ...
+      - run: npm publish --access public
+```
 
 ### access
 
@@ -290,6 +317,8 @@ provenance 用于向 npm 证明包的发布来源与仓库一致, 可以通过�
     }
   }
   ```
+
+如果通过可信发布源, 它默认启用
 
 ## 最终目录结构与发布流程
 

@@ -220,10 +220,19 @@ You don't need to specify package.json, readme.md, or license as they are automa
 
 ## Publish
 
-create a npm token for publishing:
+### Locally Publishing
 
-- Create a classic token at `https://www.npmjs.com/settings/<user>/tokens/new`
-- Or create a granular access token at `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new`
+You can publish packages to the registry using npm cli.
+
+Run `npm login` or `npm adduser` to log in.
+
+Run `npm publish` to publish.
+
+### CI/CD Publishing
+
+Create a npm token for publishing:
+
+create a granular access token at `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new`
 
 Go to `https://github.com/<user>/<repo>/settings/secrets/actions/new` to add a secret to the repository. The name can be NPM_TOKEN or a similar variable name.
 The subsequent steps remain the same. The value is the token created in the previous step.
@@ -262,6 +271,29 @@ jobs:
 When `registry-url` is set, `actions/setup-node` [uses `env.NODE_AUTH_TOKEN` as the login token by default](https://github.com/actions/setup-node/?tab=readme-ov-file#usage).
 You can change this behavior by running `npm config set //registry.npmjs.org/:_authToken ${{ secrets.NPM_TOKEN }}` in the workflow.
 
+### Trusted publishing
+
+If you use trusted publishing, you need to publish the package first.
+Then go to the package's settings page on NPM,
+fill in the username and repository name of the Git service provider,
+as well as the name of the workflow that runs the release.
+In this way, you can configure trusted publishing.
+
+When using trusted publishing, no authentication is required.
+You can safely remove the authentication content for publishing to npmjs.
+
+```yml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      # ...
+      - run: npm publish --access public
+```
+
 ### access
 
 access can be `restricted` (default) or `public`, and can be set in these ways:
@@ -291,6 +323,8 @@ provenance is used to prove to npm that the package was published from the speci
     }
   }
   ```
+
+For trusted publishing, it's enabled by default.
 
 ## Final Directory Structure and Publication Process
 

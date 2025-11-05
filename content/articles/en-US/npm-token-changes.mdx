@@ -1,0 +1,45 @@
+---
+title: NPM token changes
+---
+
+I hadn't updated my NPM package in a long time.
+
+A few days ago, when I tried to publish the new package to NPM,
+
+an error occurred in the Workflow while running the publish command.
+
+I thought I had entered the token incorrectly—and in fact, I had, as I mistakenly copied an incomplete token.
+
+So I corrected the token and tried publishing again, but the error persisted.
+
+It turned out the issue wasn't on my end, which was a bit hard to believe.
+
+Checking the error logs, I discovered that NPM had recently released a major update to token authentication.
+
+According to the description in
+[Strengthening npm security: Important changes to authentication and token management](https://github.blog/changelog/2025-09-29-strengthening-npm-security-important-changes-to-authentication-and-token-management/),
+both granular tokens and classic tokens have been adjusted.
+
+- The maximum validity period of new granular tokens is no longer unlimited; it is now 90 days at most.
+  This means you have to go to the NPM official website to update the token every 90 days at most.
+  Previously generated granular tokens are not restricted, but they may become restricted after a period of time.
+
+- Classic tokens have been completely removed.
+
+Although this change has been posted on the NPM official website all along, I never paid attention to it. I didn't expect NPM to make such a major change—it's not like NPM's style.
+For the new publishing process, NPM recommends us to use [Trusted Publishers](<(https://docs.npmjs.com/trusted-publishers)>).
+
+This method no longer requires applying for and maintaining granular tokens, and the configuration is very simple:
+
+- Go to the settings page of your package on the NPM website, and enter your Git provider's username, repository name, and the name of the workflow file used for publishing.
+
+- Run `npm publish` in the workflow to publish your package.
+
+If you previously used a workflow for publishing, after completing the settings,
+you can delete all identity authentication configurations in the workflow for publishing to npmjs.org.
+
+Trusted Publishers will automatically authenticate and generate an origin statement.
+
+While this is very convenient for existing packages, setting it up for new packages is quite cumbersome:
+you must first publish the package, then go to the settings page of the package on NPM to configure it before you can use it.
+If a repository contains multiple packages, you need to perform this operation for each package individually.
