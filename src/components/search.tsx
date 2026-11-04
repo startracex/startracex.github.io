@@ -10,23 +10,13 @@ import {
   SearchDialogOverlay,
   type SharedProps,
 } from "fumadocs-ui/components/dialog/search";
-import { useDocsSearch } from "fumadocs-core/search/client";
+import { useDocsSearch, type ClientPreset } from "fumadocs-core/search/client";
 import { useI18n } from "fumadocs-ui/contexts/i18n";
-import { create } from "@orama/orama";
-import type { Client } from "fumadocs-core/search/client";
 
-function initOrama() {
-  return create({
-    schema: { _: "string" },
-    language: "english",
-  });
-}
-
-export const clientOptions: Client =
+export const clientOptions: ClientPreset =
   process.env.NEXT_PUBLIC_OUTPUT === "export"
     ? {
         type: "static",
-        initOrama,
       }
     : {
         type: "fetch",

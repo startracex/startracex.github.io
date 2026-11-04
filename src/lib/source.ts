@@ -1,4 +1,4 @@
-import { articles } from "../../.source";
+import { articles } from "../../.source/server";
 import { loader } from "fumadocs-core/source";
 import { i18nConfig } from "./i18n";
 
