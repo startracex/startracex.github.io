@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { isNumerical } from "sharekit";
 import ArticleCard from "@/components/article-card";
 import { staticLangParams } from "@/lib/i18n";
 import { articleSource } from "@/lib/source";
@@ -20,9 +19,7 @@ export default async function Page(props: {
 }) {
   const { lang } = await props.params;
   const pages = articleSource.getPages(lang).sort((a, b) => {
-    const aDate = isNumerical(a.data.lastModified) ? new Date(a.data.lastModified) : new Date();
-    const bDate = isNumerical(b.data.lastModified) ? new Date(b.data.lastModified) : new Date();
-    return bDate.getTime() - aDate.getTime();
+    return (b.data.lastModified?.getTime() ?? 0) - (a.data.lastModified?.getTime() ?? 0);
   });
 
   const t = createTranslation(translations[lang]);
@@ -33,9 +30,7 @@ export default async function Page(props: {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
         {pages.map((page) => {
-          const date = isNumerical(page.data.lastModified)
-            ? fmtime("YYYY-MM-DD", new Date(page.data.lastModified))
-            : "";
+          const date = page.data.lastModified ? fmtime("YYYY-MM-DD", page.data.lastModified) : "";
           return (
             <Link
               className="bg-foreground/5 space-y-1 break-inside-avoid"

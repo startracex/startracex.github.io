@@ -4,6 +4,7 @@ export const articles = defineDocs({
   dir: "content/articles",
   docs: {
     schema: frontmatterSchema,
+    lastModified: true,
   },
   meta: {
     schema: metaSchema,
@@ -12,5 +13,4 @@ export const articles = defineDocs({
 
 export default defineConfig({
   mdxOptions: {},
-  lastModifiedTime: "git",
 });

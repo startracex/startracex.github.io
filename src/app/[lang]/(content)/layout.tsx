@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { RootProvider } from "fumadocs-ui/provider/next";
-import { Header } from "fumadocs-ui/layouts/home";
+import { HomeLayout } from "fumadocs-ui/layouts/home";
 import SearchDialog from "@/components/search";
 import { i18nConfig } from "@/lib/i18n";
 import { createTranslation } from "@/lib/translation";
@@ -60,7 +60,7 @@ export default async function Layout({
         }[lang],
       }}
     >
-      <Header
+      <HomeLayout
         i18n={true}
         themeSwitch={{
           enabled: false,
@@ -100,8 +100,9 @@ export default async function Layout({
           },
         ]}
         githubUrl="https://github.com/startracex/startracex.github.io"
-      />
-      <div className="mx-auto w-full max-w-320">{children}</div>
+      >
+        <div className="mx-auto w-full max-w-320">{children}</div>
+      </HomeLayout>
     </RootProvider>
   );
 }
