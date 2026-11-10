@@ -138,9 +138,10 @@ export default async function Home({
       <footer className="flex flex-col items-center gap-2 pb-4">
         <div className="cursor-crosshair mix-blend-difference bg-white text-black px-2 py-1 rounded-xs">{t`Made by Shiro Wang`}</div>
         <a
-          href={"https://github.com/startracex/startracex.github.io"}
+          href="https://github.com/startracex/startracex.github.io"
           className="hover:underline"
           target="_blank"
+          rel="noreferrer"
         >
           {t`View source on GitHub`}
         </a>

@@ -88,7 +88,7 @@ export default function ArticleCard({ title, description, date }: ArticleCardPro
           color: currentTextColor,
           transition: "background 0.3s ease-in-out",
         }}
-      ></div>
+      />
     </div>
   );
 }
