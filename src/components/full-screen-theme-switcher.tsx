@@ -114,7 +114,7 @@ export default function FullScreenThemeSwitcher({
           onMouseLeave={() => setMouseSide("none")}
         />
         <div
-          className={`absolute inset-y-0 right-0 transition-all duration-500 ease-in-out w-full bg-black`}
+          className="absolute inset-y-0 right-0 transition-all duration-500 ease-in-out w-full bg-black"
           style={{
             backgroundClip: "content-box",
             backgroundImage:

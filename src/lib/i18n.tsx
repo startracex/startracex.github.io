@@ -19,7 +19,7 @@ export const HrefLangLinks = memo(({ href, lang: excludeLang }: { lang?: string;
             rel="alternate"
             hrefLang={lang}
             href={`/${lang}${href || ""}`}
-          ></link>
+          />
         );
       })}
   </>

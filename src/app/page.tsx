@@ -15,7 +15,9 @@ export default async function Page() {
           <HrefLangLinks />
         </head>
         <body className={`${GeistSans.className} antialiased`}>
-          <ThemeProvider>{<Home params={Promise.resolve({ lang })} />}</ThemeProvider>
+          <ThemeProvider>
+            <Home params={Promise.resolve({ lang })} />
+          </ThemeProvider>
         </body>
       </html>
     );

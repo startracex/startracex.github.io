@@ -11,7 +11,7 @@ export const createTranslation = (dictionary: Record<string, string>) => {
     const parts = translationEntry.split(/\$\{(\d+)\}/);
 
     return (
-      <Fragment>
+      <>
         {parts.map((part: any, i: number) => {
           const key = i + "";
           if (i % 2 === 0) {
@@ -19,7 +19,7 @@ export const createTranslation = (dictionary: Record<string, string>) => {
           }
           return <Fragment key={key}>{values[part]}</Fragment>;
         })}
-      </Fragment>
+      </>
     );
   };
 };

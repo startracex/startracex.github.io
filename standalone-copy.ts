@@ -1,5 +1,5 @@
-import { copyFile, mkdir, readdir } from "fs/promises";
-import { existsSync } from "fs";
+import { copyFile, mkdir, readdir } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "sharekit/path";
 
 const copyDir = async (src, dest) => {

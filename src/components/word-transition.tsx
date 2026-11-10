@@ -19,7 +19,7 @@ export default function WordTransition({
   reverse = false,
 }: WordTransitionProps) {
   const [displayText, setDisplayText] = useState("");
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (words.length === 0) {
@@ -47,9 +47,8 @@ export default function WordTransition({
             return visibleCount >= wordLength - index
               ? char
               : characters[Math.floor(Math.random() * characters.length)];
-          } else {
-            return index < visibleCount ? char : characters[Math.floor(Math.random() * characters.length)];
           }
+          return index < visibleCount ? char : characters[Math.floor(Math.random() * characters.length)];
         })
         .join("");
 
@@ -57,7 +56,7 @@ export default function WordTransition({
     };
 
     updateDisplay();
-    intervalRef.current = window.setInterval(updateDisplay, stepTime);
+    intervalRef.current = globalThis.setInterval(updateDisplay, stepTime);
 
     return () => {
       if (intervalRef.current) {
