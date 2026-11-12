@@ -1,29 +1,41 @@
 "use client";
-import { useState, useEffect } from "react";
-import { ActivityCalendar } from "react-activity-calendar";
+import { useEffect, useState } from "react";
+import { ActivityCalendar, type Activity } from "react-activity-calendar";
 import { useTheme } from "ternary-theme";
 
 export default function ContributionActivity() {
   const { resolvedTheme } = useTheme();
-  const [data, setData] = useState();
+  const [data, setData] = useState<Activity[]>();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const fetchData = await fetch(
-        `https://github-contributions-api.jogruber.de/v4/startracex?y=${new Date().getFullYear()}`,
-      ).then((res) => res.json());
-      setData(fetchData.contributions);
-    };
-    fetchData();
+    setMounted(true);
   }, []);
 
+  useEffect(() => {
+    const load = async () => {
+      const response = await fetch(
+        `https://github-contributions-api.jogruber.de/v4/startracex?y=${new Date().getFullYear()}`,
+      );
+      const body = await response.json();
+      setData(body.contributions);
+    };
+    load();
+  }, []);
+
+  const colorScheme = resolvedTheme === "dark" ? "dark" : resolvedTheme === "light" ? "light" : undefined;
+
   return (
-    <ActivityCalendar
-      loading={!data}
-      data={data ?? []}
-      colorScheme={resolvedTheme}
-      showColorLegend={false}
-      showTotalCount={false}
-    />
+    <div className="min-h-32">
+      {mounted ? (
+        <ActivityCalendar
+          loading={!data}
+          data={data ?? []}
+          colorScheme={colorScheme}
+          showColorLegend={false}
+          showTotalCount={false}
+        />
+      ) : null}
+    </div>
   );
 }
