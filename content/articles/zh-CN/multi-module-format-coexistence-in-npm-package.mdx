@@ -21,17 +21,17 @@ ESM 兴起后, 许多包开始提供 ESM 版本, 但反向兼容却存在障碍,
 
 `__dirname` CJS 中的当前目录路径变量, 使用 `import.meta.dirname` 或 `dirname(fileURLToPath(import.meta.url))` 代替.
 
-`require` 将在未来的 ESM 模块中不可用, 即使支持 CJS 模块, 也无法在 ESM 模块中访问, 使用 `createRequire(import.meta.url)` 代替.
+`require` 在 ESM 模块中不可用, 即使运行时支持加载 CJS 模块, 也无法在 ESM 模块中直接访问, 使用 `createRequire(import.meta.url)` 代替.
 
 对于 `global`, 它不是模块差异, 而是运行时差异.
 
 ## 多模块格式共存的实现
 
-对于现代化项目, 最佳实践是: 使用 ESM 编写源代码, 然后使用构建工具转换为 CJS, 为他们配置相同的入口, 根据自定义条件判断使用 ESM 或 CJS 格式.
+对于现代化项目, 最佳实践是: 使用 ESM 编写源代码, 然后使用构建工具转换为 CJS, 为它们配置相同的入口, 根据条件判断使用 ESM 或 CJS 格式.
 
 这需要 package.json 的 exports 字段提供支持, 目前, 绝大多数构建工具和支持 NPM 的 CDN 服务都支持 exports 解析, 可以放心使用.
 
-通常情况下, 将与 module 匹配的格式输出到 `.js` 拓展名, 另外一个格式输出到特定的 `.mjs` 或 `.cjs` 拓展名. 或者, 将两种格式均输出到 `.mjs` 或 `.cjs` 拓展名.
+通常情况下, 将与 module 匹配的格式输出到 `.js` 扩展名, 另外一个格式输出到特定的 `.mjs` 或 `.cjs` 扩展名. 或者, 将两种格式均输出到 `.mjs` 或 `.cjs` 扩展名.
 
 也可能存在其他不需要条件判断的入口, 例如静态文件, package.json, 以及 UMD, AMD 等格式, 这些入口直接指向对应的文件.
 
@@ -44,13 +44,13 @@ ESM 兴起后, 许多包开始提供 ESM 版本, 但反向兼容却存在障碍,
   "type": "module",
   "exports": {
     ".": {
-      "import": "./index.js",
       "types": "./index.d.ts",
+      "import": "./index.js",
       "require": "./index.cjs"
     },
     "./some-file.js": {
-      "import": "./some-file.js",
       "types": "./some-file.d.ts",
+      "import": "./some-file.js",
       "require": "./some-file.cjs"
     },
     "./other-format.js": "./other-format.js",
@@ -61,4 +61,4 @@ ESM 兴起后, 许多包开始提供 ESM 版本, 但反向兼容却存在障碍,
 
 可补充 main (指向 CJS) 和 module (指向 ESM) 的代码, 不过它的优先级低于 exports, 仅对不支持 exports 的工具或缺失 exports 时有效.
 
-另外, 上述配置中的 types 字段可安全移除, 因为类型文件的主文件名与对应模块文件已保持一致.
+另外, 上述配置里的 types 条件要放在 import 和 require 前面, 也不能删掉. import 指向的 `.js` 对应 `.d.ts`, 而 require 指向的 `.cjs` 对应 `.d.cts`, 类型文件名并不一致.

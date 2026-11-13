@@ -13,7 +13,7 @@ description: 给小白和新手的建站教学.
 
 我们首先需要了解下 Web 开发的基础原理, 如果你已有了解, 可通过此章节.
 
-再原生开发中, 主要具有三大板块.
+在原生开发中, 主要具有三大板块.
 
 HTML: 负责网页的骨架, 通过 HTML 标签定义文档的结构.
 
@@ -138,13 +138,13 @@ JS: 负责网页的交互逻辑, 和动态效果.
 
 #### 使用 AI 或低代码平台生成
 
-有像 Bolt, V0 这样的 AI 平台, 它们可以根据你的需求生成前端或全栈代码. 若要能够上手其生成的内容, 可能需要了解[前面的内容](#使用编程语言和框架).
+有像 Bolt, V0 这样的 AI 平台, 它们可以根据你的需求生成前端或全栈代码. 若要能够上手其生成的内容, 可能需要了解[前面的内容](#使用编程语言-库和框架).
 
 ### 上手开发
 
 无论使用何种开发方式, 你都需要具有代码编辑器或集成开发环境, 对于 Web 开发, 你可以尝试 [VSCode](https://code.visualstudio.com) 和 [WebStorm](https://www.jetbrains.com/zh-cn/webstorm)
 
-如果你使用原生开发, 通常需要手动刷新网页, 你可以使用 [`Live Server`](https://marketplace.visualstudio.com/items?itemName=live-servers.LiveeServer) 插件, 他将监听文件变更并刷新网页.
+如果你使用原生开发, 通常需要手动刷新网页, 你可以使用 [`Live Server`](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) 插件, 它将监听文件变更并刷新网页.
 
 大多数 JavaScript 框架可能会使用 [Rollup](https://cn.rollupjs.org), [Webpack](https://webpack.js.org/) 等的打包/构建工具及其插件进行实时刷新和 JavaScript 模块热替换.
 
@@ -251,7 +251,7 @@ Markdown 无法直接渲染到页面上, 你或你的工具必须将其输出为
 
 有很多服务提供动态部署的功能, 如 Deno, Netlify, Vercel, Render 等, 这些平台操作比较简短.
 
-只需要链接你的 GitHub 账户, 然后选择需要部署的项目, 它们可以自动推断所使用的框架和库, 构建命令, 输出,目录等.
+只需要链接你的 GitHub 账户, 然后选择需要部署的项目, 它们可以自动推断所使用的框架和库, 构建命令, 输出目录等.
 
 由于这些服务对于非 `TypeScript/JavaScript` 项目具有很大局限性, 或者需要自托管的情况下, 你需要使用自己的服务器进行部署.
 
@@ -266,7 +266,7 @@ Markdown 无法直接渲染到页面上, 你或你的工具必须将其输出为
 
 启动你的网站服务器.
 
-对你的服务器的进行设置, 如绑定域名, 配置端口等.
+对你的服务器进行设置, 如绑定域名, 配置端口等.
 
 ## Fork 这个项目
 
@@ -286,7 +286,7 @@ Markdown 无法直接渲染到页面上, 你或你的工具必须将其输出为
 - `Shiro`, `Wang`, `Shiro Wang` 和 `startracex` 这些是作者名称.
 - `content/articles` 目录下的内容, 这是包括此文在内的所有文章.
 
-运行 `pnpm build` 为生成环境进行构建, 若要使用独立构建, 则替换为 `pnpm build:standalone`.
+运行 `pnpm build` 为生产环境进行构建, 若要使用独立构建, 则替换为 `pnpm build:standalone`.
 
 构建完成后可以运行 `pnpm start` 或 `pnpm start:standalone` 启动.
 

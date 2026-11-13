@@ -9,7 +9,7 @@ import { File, Folder, Files } from "fumadocs-ui/components/files";
 
 为保持教程的简单, 我们不会涉及其他工具, 如代码检查, 格式化, 测试, 打包等环节. 但会添加类型声明和发布出处, 以及其他必要内容.
 
-此文章中的连接使用 `<user>` 和 `<repo>` 作为占位符, 在导航时请注意进行替换.
+此文章中的链接使用 `<user>` 和 `<repo>` 作为占位符, 在导航时请注意进行替换.
 
 ## 准备工作
 
@@ -82,7 +82,7 @@ function padNumberArray(n: number, padLen = 2): string[] {
 export function createKeyCharMap(date: Date): Record<string, string[]> {
   const z = date.getTimezoneOffset() / -60;
   return {
-    Z: [z === 0 ? "0" : z > 0 ? `+${z}` : `-${z}`],
+    Z: [z === 0 ? "0" : z > 0 ? `+${z}` : `${z}`],
     Y: padNumberArray(date.getFullYear()),
     M: padNumberArray(date.getMonth() + 1),
     D: padNumberArray(date.getDate()),
@@ -186,7 +186,7 @@ dist
 }
 ```
 
-这样, 当用户就可以通过 `import "@scope/pkg"` 和 `import "@scope/pkg/utils.js"` 来引入我们导出的模块.
+这样, 用户就可以通过 `import "@scope/pkg"` 和 `import "@scope/pkg/utils.js"` 来引入我们导出的模块.
 
 ## 编写说明文档
 
