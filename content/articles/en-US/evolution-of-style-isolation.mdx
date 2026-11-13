@@ -1,5 +1,5 @@
 ---
-title: Evolution of Style scoping isolation
+title: Evolution of Style Isolation
 description: "The Evolution of Style Isolation: From Naming Conventions to Web Standards"
 ---
 
@@ -70,12 +70,11 @@ The @scope is a new CSS rule that allows defining precise scopes.
 </div>
 ```
 
-Unfortunately, browser compatibility for this rule is too low for widespread adoption.
-For unsupported devices, you can try [this Polyfill](https://github.com/samthor/scoped).
+This rule is now supported in current major browsers. The linked [polyfill](https://github.com/samthor/scoped) targets the older `<style scoped>` attribute and does not implement `@scope`.
 
 ### Shadow DOM
 
-Shadow DOM allows creating independent subtree for elements, with internal styles completely isolated from the main document.
+Shadow DOM allows creating an independent subtree for an element, with internal styles completely isolated from the main document.
 
 Only CSS variables, some CSS rules, and `::part` selectors can penetrate Shadow DOM.
 

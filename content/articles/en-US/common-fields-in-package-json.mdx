@@ -60,7 +60,7 @@ Some package managers also allow changing the publish directory or modifying mor
 
 ### files
 
-files is used to specify files to be published. If present, it will disable the ignore rules in .npmignore.
+files is used to specify files to be published. A root .npmignore does not override files, but a .npmignore inside a subdirectory still excludes files.
 
 ## Entry Points
 
@@ -76,7 +76,7 @@ bin is used to specify executable files for the package. This field should be an
 
 The keys in bin will be used as command names for package managers to execute, or to run directly when installed globally.
 
-If you execute a command exposed by an uninstalled package, or execute a package's creator, it will be the command with the same name as the package. If it doesn't exist, the execution will fail.
+If you execute a command exposed by an uninstalled package, or run a package initializer, the command name is the same as the package name. If it doesn't exist, the execution will fail.
 
 ### exports
 
@@ -108,9 +108,9 @@ Some special scripts run with the lifecycle, and commands starting with `pre` an
 
 packageManager is used to specify the package manager. If the local package manager doesn't match the project, most commands will fail directly. Some toolchains may require this field to distinguish package managers.
 
-### packages
+### workspaces
 
-packages is used to specify other package paths in a monorepo. Some package managers do not follow this field, such as pnpm.
+workspaces specifies the paths of other packages in a monorepo, inside package.json. npm and Yarn follow this field. pnpm does not read it; workspace paths go in the packages field of pnpm-workspace.yaml.
 
 ## Dependency Management
 

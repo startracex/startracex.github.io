@@ -35,7 +35,7 @@ My personal tsconfig has two main modes: one for library development and one for
 }
 ```
 
-Setting `target` to `ESNext` transform code to the latest ECMAScript syntax, and including necessary libraries in `lib`.
+Setting `target` to `ESNext` transforms code to the latest ECMAScript syntax, and the necessary libraries are included in `lib`.
 
 Setting `module` and `moduleResolution` to `NodeNext` enforces file extension usage and handles `imports` and `exports` fields.
 
@@ -49,7 +49,7 @@ Enabling `resolvePackageJsonImports` and `resolvePackageJsonExports` ensures adh
 
 `allowSyntheticDefaultImports` and `esModuleInterop` facilitate proper ESM imports of CJS modules.
 
-`useDefineForClassFields` and `experimentalDecorators` support class fields and decorators while avoiding `object.defineProperty` for class fields or excessive code output for new decorators.
+`useDefineForClassFields` and `experimentalDecorators` support class fields and decorators while avoiding `Object.defineProperty` for class fields or excessive code output for new decorators.
 Adjust these based on project needs to comply with ECMAScript class field standards or new decorator specifications.
 
 ## Library Mode
@@ -71,7 +71,7 @@ The library configuration is designed for library development using tsc for buil
 
 `declaration`, `declarationMap`, and `sourceMap` should all be `true` to generate `.d.ts`, `.d.ts.map`, and `.js.map` files for type checking and debugging.
 
-Setting `erasableSyntaxOnly` to `true` prevents non-ECMAScript syntax usage, disabling enums, namespaces, constructor parameter access descriptors, and `import =`/`export =` assignments.
+Setting `erasableSyntaxOnly` to `true` prevents non-ECMAScript syntax usage, disabling enums, namespaces, constructor parameter properties, and `import =`/`export =` assignments.
 
 For type imports like `import type`, you may need to enforce them by setting `verbatimModuleSyntax` to `true`, allowing the transformer to quickly distinguish between type and value imports.
 

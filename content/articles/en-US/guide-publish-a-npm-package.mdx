@@ -7,7 +7,7 @@ import { File, Folder, Files } from "fumadocs-ui/components/files";
 
 This tutorial will walk you through publishing a basic npm package from GitHub Action to the npmjs registry.
 
-To keep things simple, we won't cover additional tools like code linting, formatting, testing, or packaging. However, we will include type declarations, publication origins, and other necessary elements.
+To keep things simple, we won't cover additional tools like code linting, formatting, testing, or packaging. However, we will include type declarations, provenance, and other necessary elements.
 
 Links in this article use `<user>` and `<repo>` as placeholders. Please replace them when navigating.
 
@@ -82,7 +82,7 @@ function padNumberArray(n: number, padLen = 2): string[] {
 export function createKeyCharMap(date: Date): Record<string, string[]> {
   const z = date.getTimezoneOffset() / -60;
   return {
-    Z: [z === 0 ? "0" : z > 0 ? `+${z}` : `-${z}`],
+    Z: [z === 0 ? "0" : z > 0 ? `+${z}` : `${z}`],
     Y: padNumberArray(date.getFullYear()),
     M: padNumberArray(date.getMonth() + 1),
     D: padNumberArray(date.getDate()),
@@ -220,7 +220,7 @@ You don't need to specify package.json, readme.md, or license as they are automa
 
 ## Publish
 
-### Locally Publishing
+### Local Publishing
 
 You can publish packages to the registry using npm cli.
 
@@ -230,7 +230,7 @@ Run `npm publish` to publish.
 
 ### CI/CD Publishing
 
-Create a npm token for publishing:
+Create an npm token for publishing:
 
 create a granular access token at `https://www.npmjs.com/settings/<user>/tokens/granular-access-tokens/new`
 
@@ -253,8 +253,8 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
           registry-url: https://registry.npmjs.org

@@ -21,13 +21,13 @@ Some content differs between ESM and CJS. Most converters do not handle these be
 
 `__dirname` is a variable in CJS for the current directory path. Use `import.meta.dirname` or `dirname(fileURLToPath(import.meta.url))` instead.
 
-`require` will not be available in future ESM modules. Even if CJS modules are supported, they cannot be accessed in ESM modules. Use `createRequire(import.meta.url)` instead.
+`require` is not available in ESM modules. Even if the runtime can load CJS modules, it cannot be accessed directly inside an ESM module. Use `createRequire(import.meta.url)` instead.
 
 As for `global`, it's not a module difference but a runtime difference.
 
 ## Implementation of Multi-module Format Coexistence
 
-For modern projects, the best practice is: write source code using ESM, then use build tools to convert to CJS. Configure the same entry for both formats and determine whether to use ESM or CJS based on custom conditions.
+For modern projects, the best practice is: write source code using ESM, then use build tools to convert to CJS. Configure the same entry for both formats and choose ESM or CJS based on conditions.
 
 This requires support from the exports field in package.json. Currently, most build tools and NPM-supporting CDN services support exports resolution, so you can use it with confidence.
 
@@ -44,13 +44,13 @@ For the above situations, we can use the following package.json configuration:
   "type": "module",
   "exports": {
     ".": {
-      "import": "./index.js",
       "types": "./index.d.ts",
+      "import": "./index.js",
       "require": "./index.cjs"
     },
     "./some-file.js": {
-      "import": "./some-file.js",
       "types": "./some-file.d.ts",
+      "import": "./some-file.js",
       "require": "./some-file.cjs"
     },
     "./other-format.js": "./other-format.js",
@@ -61,4 +61,4 @@ For the above situations, we can use the following package.json configuration:
 
 You can supplement with main (pointing to CJS) and module (pointing to ESM), but their priority is lower than exports. They only take effect for tools that do not support exports or when exports is missing.
 
-Additionally, the types field in the above configuration can be safely removed because the main filename of the type file is consistent with the corresponding module file.
+Additionally, the types condition in the configuration above has to come before import and require, and it cannot be removed. The `.js` file targeted by import corresponds to `.d.ts`, while the `.cjs` file targeted by require corresponds to `.d.cts`, so the type filenames do not match.

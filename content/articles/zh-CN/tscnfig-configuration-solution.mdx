@@ -37,20 +37,20 @@ description: 分享我自己的 TSConfig 配置方案
 
 `target` 设置为 `ESNext`, 这会将代码转换为最新的 ECMAScript 语法, 在 `lib` 里包含所必须的库.
 
-`module` 和 `moduleResolution` 设置为 `NodeNext`, tsc 将强制要求使用拓展名, 并处理 `imports` 和 `exports` 字段.
+`module` 和 `moduleResolution` 设置为 `NodeNext`, tsc 将强制要求使用扩展名, 并处理 `imports` 和 `exports` 字段.
 
 `resolvePackageJsonImports`, `resolvePackageJsonExports` 设置为 `true`, 确保无论何种模块解析策略, 都遵循 `imports` 和 `exports`.
 
 `customConditions` 处理 `imports` 和 `exports` 中导出的 ES 模块, 并优先使用开发条件.
 
-`allowImportingTsExtensions` 和 `rewriteRelativeImportExtensions` 允许导入 `.ts` 拓展名, 并在输出时自动修改为 `.js`.
+`allowImportingTsExtensions` 和 `rewriteRelativeImportExtensions` 允许导入 `.ts` 扩展名, 并在输出时自动修改为 `.js`.
 
 `forceConsistentCasingInFileNames` 确保文件名的大小写与导入路径一致, 这在 Windows 等大小写不敏感的系统中尤为重要.
 
 `allowSyntheticDefaultImports` 和 `esModuleInterop` 用于正确在 ESM 中导入 CJS 模块.
 
 `useDefineForClassFields` 和 `experimentalDecorators` 用于支持类字段和装饰器.
-避免使用 `object.defineProperty` 定义类字段, 或者为新版装饰器输出大量代码, 若要遵循 ECMAScript 的类字段或兼容新版装饰器规范，可根据项目需求调整.
+避免使用 `Object.defineProperty` 定义类字段, 或者为新版装饰器输出大量代码, 若要遵循 ECMAScript 的类字段或兼容新版装饰器规范，可根据项目需求调整.
 
 ## 库模式
 
@@ -94,9 +94,9 @@ description: 分享我自己的 TSConfig 配置方案
 
 应用模式理想应该是与 `"noEmit": true` 搭配, TypeScript 仅进行类型检查, 实际的输出由打包器或构建工具处理.
 
-应用模式将使用 `Bundler` 作为模块解析策略, 它不强制要求导入添加拓展名.
+应用模式将使用 `Bundler` 作为模块解析策略, 它不强制要求导入添加扩展名.
 
-`allowArbitraryExtensions` 允许导入任意拓展名的文件.
+`allowArbitraryExtensions` 允许导入任意扩展名的文件.
 
 jsx 设置为 `preserve` 避免与构建工具的 JSX 处理流程冲突, 同时避免类型错误.
 

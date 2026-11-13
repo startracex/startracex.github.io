@@ -60,7 +60,7 @@ publishConfig 用于更改发布配置, 例如更改访问级别 (access), 注�
 
 ### files
 
-files 用于指定发布的文件, 如果存在, 将禁用 .npmignore 的忽略规则.
+files 用于指定发布的文件. 根目录的 .npmignore 不会覆盖 files, 但子目录中的 .npmignore 仍会排除文件.
 
 ## 入口
 
@@ -74,9 +74,9 @@ types 是包的 TypeScript 类型主入口.
 
 bin 用于指定包的可执行文件, 该字段应该是一个对象, 如果不是对象, 运行 `npm pkg fix` 格式化到实际值.
 
-bin 中的键将作为命令名称以供包管理器执行, 或全局按照以直接执行.
+bin 中的键将作为命令名称, 供包管理器执行, 或在全局安装后直接执行.
 
-如果执行一个未安装的包暴露的命令, 或者执行一个包的创建器 则为与包名同名的命令, 如果不存在, 运行将失败.
+如果执行一个未安装的包暴露的命令, 或者执行一个包的创建器, 则为与包名同名的命令, 如果不存在, 运行将失败.
 
 ### exports
 
@@ -108,9 +108,9 @@ scripts 用于声明命令别名, 并且可以直接运行包的可执行文件.
 
 packageManager 用于指定包管理器, 如果本地包管理器与项目不匹配, 大多数命令将直接失败, 一些工具链可能需要此字段来区分包管理器.
 
-### packages
+### workspaces
 
-packages 用于指定单体仓库里的其他包路径, 一些包管理器不会遵循此字段, 例如 pnpm.
+workspaces 用于在 package.json 里指定单体仓库中其他包的路径. npm 和 Yarn 会遵循此字段. pnpm 不读取它, 工作区路径写在 pnpm-workspace.yaml 的 packages 字段.
 
 ## 依赖管理
 
@@ -120,7 +120,7 @@ dependencies 是包的直接依赖, 包管理器会在安装此包时一同安�
 
 ### devDependencies
 
-devDependencies 作为开发依赖, 不会再安装此包时一同被安装.
+devDependencies 作为开发依赖, 不会在安装此包时一同被安装.
 
 ### peerDependencies
 
@@ -128,7 +128,7 @@ peerDependencies 在包可能需要某个依赖, 但不作为直接依赖时有�
 
 ### optionalDependencies
 
-optionalDependencies 在安装失败, 或者不匹配平台和系统, 不会一同被安装.
+optionalDependencies 在安装失败, 或者不匹配平台和系统时, 不会一同被安装.
 
 ## 限制
 
@@ -136,7 +136,7 @@ optionalDependencies 在安装失败, 或者不匹配平台和系统, 不会一�
 
 os 与 cpu 将在不匹配当前系统和架构时被跳过, 强制安装将会忽略这些限制.
 
-os 为 "linux" 是也可以指定 libc.
+os 为 "linux" 时也可以指定 libc.
 
 ### engines
 
